@@ -179,6 +179,22 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             color: highlight.color ? processTokenValue(highlight.color, primitiveTokens) : undefined
           };
         }
+        // Special handling for content
+        else if (key === 'content' && typeof val === 'object' && val !== null) {
+          const content = val as {
+            background?: any;
+            hover?: { background?: any; color?: any };
+            border?: { color?: any };
+            color?: any;
+          };
+          processed[key] = {
+            background: content.background ? processTokenValue(content.background, primitiveTokens) : undefined,
+            hoverBackground: content.hover?.background ? processTokenValue(content.hover.background, primitiveTokens) : undefined,
+            borderColor: content.border?.color ? processTokenValue(content.border.color, primitiveTokens) : undefined,
+            color: content.color ? processTokenValue(content.color, primitiveTokens) : undefined,
+            hoverColor: content.hover?.color ? processTokenValue(content.hover.color, primitiveTokens) : undefined
+          };
+        }
         // Special handling for form field in colorScheme
         else if (key === 'form' && typeof val === 'object' && val !== null && 'field' in val) {
           const field = val.field as {
