@@ -195,6 +195,20 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             hoverColor: content.hover?.color ? processTokenValue(content.hover.color, primitiveTokens) : undefined
           };
         }
+        // Special handling for text
+        else if (key === 'text' && typeof val === 'object' && val !== null) {
+          const text = val as {
+            color?: any;
+            hover?: { color?: any; muted?: { color?: any } };
+            muted?: { color?: any };
+          };
+          processed[key] = {
+            color: text.color ? processTokenValue(text.color, primitiveTokens) : undefined,
+            hoverColor: text.hover?.color ? processTokenValue(text.hover.color, primitiveTokens) : undefined,
+            mutedColor: text.muted?.color ? processTokenValue(text.muted.color, primitiveTokens) : undefined,
+            hoverMutedColor: text.hover?.muted?.color ? processTokenValue(text.hover.muted.color, primitiveTokens) : undefined
+          };
+        }
         // Special handling for form field in colorScheme
         else if (key === 'form' && typeof val === 'object' && val !== null && 'field' in val) {
           const field = val.field as {
