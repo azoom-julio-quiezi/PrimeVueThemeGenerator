@@ -69,6 +69,9 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
             .join(', ');
         } else if (typeof processedValue === 'object' && processedValue !== null) {
+          if (isShadowValue(processedValue)) {
+            return `${processedValue.x} ${processedValue.y} ${processedValue.blur} ${processedValue.spread} ${processedValue.color}`;
+          }
           return Object.values(processedValue)
             .filter(isShadowValue)
             .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
@@ -148,7 +151,12 @@ function processFormField(formField: any): ProcessedFormField {
     if (ring.style?.$value) focusRing.style = ring.style.$value;
     if (ring.color?.$value) focusRing.color = ring.color.$value;
     if (ring.offset?.$value) focusRing.offset = ring.offset.$value;
-    if (ring.shadow?.$value) focusRing.shadow = processTokenValue(ring.shadow, {});
+    if (ring.shadow?.$value) {
+      const shadowValue = ring.shadow.$value;
+      if (shadowValue && typeof shadowValue === 'object' && 'x' in shadowValue && 'y' in shadowValue && 'blur' in shadowValue && 'spread' in shadowValue && 'color' in shadowValue) {
+        focusRing.shadow = `${shadowValue.x} ${shadowValue.y} ${shadowValue.blur} ${shadowValue.spread} ${shadowValue.color}`;
+      }
+    }
 
     if (Object.keys(focusRing).length > 0) {
       processed.focusRing = focusRing;
