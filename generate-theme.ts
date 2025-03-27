@@ -244,6 +244,31 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             shadow: field.shadow ? processTokenValue(field.shadow, primitiveTokens) : undefined
           };
         }
+        // Special handling for overlay
+        else if (key === 'overlay' && typeof val === 'object' && val !== null) {
+          const overlay = val as {
+            select?: { background?: any; border?: { color?: any }; color?: any };
+            popover?: { background?: any; border?: { color?: any }; color?: any };
+            modal?: { background?: any; border?: { color?: any }; color?: any };
+          };
+          processed[key] = {
+            select: overlay.select ? {
+              background: overlay.select.background ? processTokenValue(overlay.select.background, primitiveTokens) : undefined,
+              borderColor: 'transparent',
+              color: overlay.select.color ? processTokenValue(overlay.select.color, primitiveTokens) : undefined
+            } : undefined,
+            popover: overlay.popover ? {
+              background: overlay.popover.background ? processTokenValue(overlay.popover.background, primitiveTokens) : undefined,
+              borderColor: 'transparent',
+              color: overlay.popover.color ? processTokenValue(overlay.popover.color, primitiveTokens) : undefined
+            } : undefined,
+            modal: overlay.modal ? {
+              background: overlay.modal.background ? processTokenValue(overlay.modal.background, primitiveTokens) : undefined,
+              borderColor: 'transparent',
+              color: overlay.modal.color ? processTokenValue(overlay.modal.color, primitiveTokens) : undefined
+            } : undefined
+          };
+        }
         else {
           processed[key] = processedValue;
         }
