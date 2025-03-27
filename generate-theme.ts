@@ -132,23 +132,43 @@ function processTokenValue(value: any, primitiveTokens: any): any {
         else if (key === 'transition' && typeof val === 'object' && val !== null && 'duration' in val) {
           processed.transitionDuration = processTokenValue(val.duration, primitiveTokens);
         }
-        // Special handling for navigation submenu
-        else if (key === 'submenu' && typeof val === 'object' && val !== null) {
-          const submenu = val as {
-            label?: { padding?: any; font?: { weight?: any } };
-            icon?: { size?: any }
+        // Special handling for navigation
+        else if (key === 'navigation' && typeof val === 'object' && val !== null) {
+          const navigation = val as {
+            item?: {
+              focus?: { background?: any; color?: any };
+              active?: { background?: any; color?: any };
+              color?: any;
+              icon?: { color?: any; focus?: { color?: any }; active?: { color?: any } };
+            };
+            submenu?: {
+              label?: { background?: any; color?: any };
+              icon?: { color?: any; focus?: { color?: any }; active?: { color?: any } };
+            };
           };
-          if (submenu.label) {
-            processed.submenuLabel = {
-              padding: submenu.label.padding ? processTokenValue(submenu.label.padding, primitiveTokens) : undefined,
-              fontWeight: submenu.label.font?.weight ? processTokenValue(submenu.label.font.weight, primitiveTokens) : undefined
-            };
-          }
-          if (submenu.icon) {
-            processed.submenuIcon = {
-              size: submenu.icon.size ? processTokenValue(submenu.icon.size, primitiveTokens) : undefined
-            };
-          }
+          processed[key] = {
+            item: navigation.item ? {
+              focusBackground: navigation.item.focus?.background ? processTokenValue(navigation.item.focus.background, primitiveTokens) : undefined,
+              activeBackground: navigation.item.active?.background ? processTokenValue(navigation.item.active.background, primitiveTokens) : undefined,
+              color: navigation.item.color ? processTokenValue(navigation.item.color, primitiveTokens) : undefined,
+              focusColor: navigation.item.focus?.color ? processTokenValue(navigation.item.focus.color, primitiveTokens) : undefined,
+              activeColor: navigation.item.active?.color ? processTokenValue(navigation.item.active.color, primitiveTokens) : undefined,
+              icon: navigation.item.icon ? {
+                color: navigation.item.icon.color ? processTokenValue(navigation.item.icon.color, primitiveTokens) : undefined,
+                focusColor: navigation.item.icon.focus?.color ? processTokenValue(navigation.item.icon.focus.color, primitiveTokens) : undefined,
+                activeColor: navigation.item.icon.active?.color ? processTokenValue(navigation.item.icon.active.color, primitiveTokens) : undefined
+              } : undefined
+            } : undefined,
+            submenuLabel: navigation.submenu?.label ? {
+              background: 'transparent',
+              color: navigation.submenu.label.color ? processTokenValue(navigation.submenu.label.color, primitiveTokens) : undefined
+            } : undefined,
+            submenuIcon: navigation.submenu?.icon ? {
+              color: navigation.submenu.icon.color ? processTokenValue(navigation.submenu.icon.color, primitiveTokens) : undefined,
+              focusColor: navigation.submenu.icon.focus?.color ? processTokenValue(navigation.submenu.icon.focus.color, primitiveTokens) : undefined,
+              activeColor: navigation.submenu.icon.active?.color ? processTokenValue(navigation.submenu.icon.active.color, primitiveTokens) : undefined
+            } : undefined
+          };
         }
         // Special handling for primary colors in colorScheme
         else if (key === 'primary' && typeof val === 'object' && val !== null) {
