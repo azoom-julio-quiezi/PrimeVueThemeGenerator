@@ -132,6 +132,53 @@ function processTokenValue(value: any, primitiveTokens: any): any {
         else if (key === 'transition' && typeof val === 'object' && val !== null && 'duration' in val) {
           processed.transitionDuration = processTokenValue(val.duration, primitiveTokens);
         }
+        // Special handling for navigation submenu
+        else if (key === 'submenu' && typeof val === 'object' && val !== null) {
+          const submenu = val as {
+            label?: { padding?: any; font?: { weight?: any } };
+            icon?: { size?: any }
+          };
+          if (submenu.label) {
+            processed.submenuLabel = {
+              padding: submenu.label.padding ? processTokenValue(submenu.label.padding, primitiveTokens) : undefined,
+              fontWeight: submenu.label.font?.weight ? processTokenValue(submenu.label.font.weight, primitiveTokens) : undefined
+            };
+          }
+          if (submenu.icon) {
+            processed.submenuIcon = {
+              size: submenu.icon.size ? processTokenValue(submenu.icon.size, primitiveTokens) : undefined
+            };
+          }
+        }
+        // Special handling for primary colors in colorScheme
+        else if (key === 'primary' && typeof val === 'object' && val !== null) {
+          const primary = val as {
+            color?: any;
+            contrast?: { color?: any };
+            hover?: { color?: any };
+            active?: { color?: any };
+          };
+          processed[key] = {
+            color: primary.color ? processTokenValue(primary.color, primitiveTokens) : undefined,
+            contrastColor: primary.contrast?.color ? processTokenValue(primary.contrast.color, primitiveTokens) : undefined,
+            hoverColor: primary.hover?.color ? processTokenValue(primary.hover.color, primitiveTokens) : undefined,
+            activeColor: primary.active?.color ? processTokenValue(primary.active.color, primitiveTokens) : undefined
+          };
+        }
+        // Special handling for highlight colors
+        else if (key === 'highlight' && typeof val === 'object' && val !== null) {
+          const highlight = val as {
+            background?: any;
+            focus?: { background?: any; color?: any };
+            color?: any;
+          };
+          processed[key] = {
+            backgroundColor: highlight.background ? processTokenValue(highlight.background, primitiveTokens) : undefined,
+            focusBackgroundColor: highlight.focus?.background ? processTokenValue(highlight.focus.background, primitiveTokens) : undefined,
+            focusColor: highlight.focus?.color ? processTokenValue(highlight.focus.color, primitiveTokens) : undefined,
+            color: highlight.color ? processTokenValue(highlight.color, primitiveTokens) : undefined
+          };
+        }
         else {
           processed[key] = processedValue;
         }
