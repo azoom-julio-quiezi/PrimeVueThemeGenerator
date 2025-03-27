@@ -179,6 +179,41 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             color: highlight.color ? processTokenValue(highlight.color, primitiveTokens) : undefined
           };
         }
+        // Special handling for form field in colorScheme
+        else if (key === 'form' && typeof val === 'object' && val !== null && 'field' in val) {
+          const field = val.field as {
+            background?: any;
+            disabled?: { background?: any; color?: any };
+            filled?: { background?: any; focus?: { background?: any }; hover?: { background?: any } };
+            border?: { color?: any };
+            hover?: { border?: { color?: any } };
+            focus?: { border?: { color?: any } };
+            invalid?: { border?: { color?: any }; placeholder?: { color?: any } };
+            color?: any;
+            placeholder?: { color?: any };
+            float?: { label?: { color?: any; focus?: { color?: any }; invalid?: { color?: any } } };
+            icon?: { color?: any };
+            shadow?: any;
+          };
+          processed.formField = {
+            background: field.background ? processTokenValue(field.background, primitiveTokens) : undefined,
+            disabledBackground: field.disabled?.background ? processTokenValue(field.disabled.background, primitiveTokens) : undefined,
+            filledBackground: field.filled?.background ? processTokenValue(field.filled.background, primitiveTokens) : undefined,
+            filledFocusBackground: field.filled?.focus?.background ? processTokenValue(field.filled.focus.background, primitiveTokens) : undefined,
+            borderColor: field.border?.color ? processTokenValue(field.border.color, primitiveTokens) : undefined,
+            hoverBorderColor: field.hover?.border?.color ? processTokenValue(field.hover.border.color, primitiveTokens) : undefined,
+            focusBorderColor: field.focus?.border?.color ? processTokenValue(field.focus.border.color, primitiveTokens) : undefined,
+            invalidBorderColor: field.invalid?.border?.color ? processTokenValue(field.invalid.border.color, primitiveTokens) : undefined,
+            color: field.color ? processTokenValue(field.color, primitiveTokens) : undefined,
+            disabledColor: field.disabled?.color ? processTokenValue(field.disabled.color, primitiveTokens) : undefined,
+            placeholderColor: field.placeholder?.color ? processTokenValue(field.placeholder.color, primitiveTokens) : undefined,
+            floatLabelColor: field.float?.label?.color ? processTokenValue(field.float.label.color, primitiveTokens) : undefined,
+            floatLabelFocusColor: field.float?.label?.focus?.color ? processTokenValue(field.float.label.focus.color, primitiveTokens) : undefined,
+            floatLabelInvalidColor: field.float?.label?.invalid?.color ? processTokenValue(field.float.label.invalid.color, primitiveTokens) : undefined,
+            iconColor: field.icon?.color ? processTokenValue(field.icon.color, primitiveTokens) : undefined,
+            shadow: field.shadow ? processTokenValue(field.shadow, primitiveTokens) : undefined
+          };
+        }
         else {
           processed[key] = processedValue;
         }
