@@ -115,7 +115,20 @@ function processTokenValue(value: any, primitiveTokens: any): any {
         // Special handling for border.radius in primitive tokens
         if (key === 'border' && typeof val === 'object' && val !== null && 'radius' in val) {
           processed.borderRadius = processedValue.radius;
-        } else {
+        } 
+        // Special handling for list option group
+        else if (key === 'option' && typeof val === 'object' && val !== null && 'group' in val) {
+          processed[key] = { ...processedValue };
+          delete processed[key].group;
+          const group = val.group as { padding?: any; font?: { weight?: any } };
+          if (group) {
+            processed.optionGroup = {
+              padding: group.padding ? processTokenValue(group.padding, primitiveTokens) : undefined,
+              fontWeight: group.font?.weight ? processTokenValue(group.font.weight, primitiveTokens) : undefined
+            };
+          }
+        }
+        else {
           processed[key] = processedValue;
         }
       }
