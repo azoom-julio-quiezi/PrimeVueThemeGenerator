@@ -269,6 +269,37 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             } : undefined
           };
         }
+        // Special handling for list
+        else if (key === 'list' && typeof val === 'object' && val !== null) {
+          const list = val as {
+            option?: {
+              focus?: { background?: any; color?: any };
+              selected?: { background?: any; focus?: { background?: any; color?: any }; color?: any };
+              color?: any;
+              icon?: { color?: any; focus?: { color?: any } };
+              group?: { background?: any; color?: any };
+            };
+          };
+          processed[key] = {
+            option: list.option ? {
+              focusBackground: list.option.focus?.background ? processTokenValue(list.option.focus.background, primitiveTokens) : undefined,
+              selectedBackground: list.option.selected?.background ? processTokenValue(list.option.selected.background, primitiveTokens) : undefined,
+              selectedFocusBackground: list.option.selected?.focus?.background ? processTokenValue(list.option.selected.focus.background, primitiveTokens) : undefined,
+              color: list.option.color ? processTokenValue(list.option.color, primitiveTokens) : undefined,
+              focusColor: list.option.focus?.color ? processTokenValue(list.option.focus.color, primitiveTokens) : undefined,
+              selectedColor: list.option.selected?.color ? processTokenValue(list.option.selected.color, primitiveTokens) : undefined,
+              selectedFocusColor: list.option.selected?.focus?.color ? processTokenValue(list.option.selected.focus.color, primitiveTokens) : undefined,
+              icon: list.option.icon ? {
+                color: list.option.icon.color ? processTokenValue(list.option.icon.color, primitiveTokens) : undefined,
+                focusColor: list.option.icon.focus?.color ? processTokenValue(list.option.icon.focus.color, primitiveTokens) : undefined
+              } : undefined
+            } : undefined,
+            optionGroup: list.option?.group ? {
+              background: 'transparent',
+              color: list.option.group.color ? processTokenValue(list.option.group.color, primitiveTokens) : undefined
+            } : undefined
+          };
+        }
         else {
           processed[key] = processedValue;
         }
