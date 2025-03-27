@@ -210,6 +210,14 @@ function generateTheme(tokens: any): any {
       disabledOpacity: processed.disabled?.opacity?.$value || processed.disabled?.opacity,
       iconSize: processed.icon?.size?.$value || processed.icon?.size,
       anchorGutter: processed.anchor?.gutter?.$value || processed.anchor?.gutter,
+      focusRing: {
+        width: processed.focus?.ring?.width?.$value || processed.focus?.ring?.width,
+        style: processed.focus?.ring?.style?.$value || processed.focus?.ring?.style,
+        color: processed.focus?.ring?.color?.$value || processed.focus?.ring?.color,
+        offset: processed.focus?.ring?.offset?.$value || processed.focus?.ring?.offset,
+        shadow: processed.focus?.ring?.shadow?.$value || processed.focus?.ring?.shadow,
+        stroke: processed.focus?.ring?.stroke
+      },
       ...processed
     };
 
@@ -219,9 +227,10 @@ function generateTheme(tokens: any): any {
     delete result.semantic.icon?.size;
     delete result.semantic.anchor?.gutter;
     delete result.semantic.form?.field;
+    delete result.semantic.focus?.ring;
 
     // Clean up empty objects
-    ['transition', 'disabled', 'icon', 'anchor', 'form'].forEach(key => {
+    ['transition', 'disabled', 'icon', 'anchor', 'form', 'focus'].forEach(key => {
       if (result.semantic[key] && Object.keys(result.semantic[key]).length === 0) {
         delete result.semantic[key];
       }
