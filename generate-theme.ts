@@ -128,6 +128,10 @@ function processTokenValue(value: any, primitiveTokens: any): any {
             };
           }
         }
+        // Special handling for transition.duration
+        else if (key === 'transition' && typeof val === 'object' && val !== null && 'duration' in val) {
+          processed.transitionDuration = processTokenValue(val.duration, primitiveTokens);
+        }
         else {
           processed[key] = processedValue;
         }
