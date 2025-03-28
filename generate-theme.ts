@@ -3,10 +3,25 @@ import * as path from 'path';
 
 interface Token {
   $type?: string;
-  $value?: any;
+  $value?: string | number | object;
   [key: string]: any;
 }
 
+interface TokenSet {
+  primitive?: any;
+  semantic?: any;
+  light?: any;
+  dark?: any;
+}
+
+interface ShadowValue {
+  x?: string;
+  y?: string;
+  blur?: string;
+  spread?: string;
+  color?: string;
+  type: 'dropShadow';
+}
 interface ProcessedFormField {
   paddingX?: string;
   paddingY?: string;
@@ -32,14 +47,40 @@ interface ProcessedFormField {
   };
 }
 
-interface ShadowValue {
-  x: string;
-  y: string;
-  blur: string;
-  spread: string;
-  color: string;
-  type: 'dropShadow';
+interface ProcessedList {
+  padding?: string;
+  gap?: string;
+  header?: {
+    padding?: string;
+  }
+  option?: {
+    padding?: string;
+    borderRadius?: string;
+  }
+  optionGroup?: {
+    padding?: string;
+    fontWeight?: string;
+  }
 }
+
+// Special token transformations mapping
+const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
+  'border.radius': 'borderRadius',
+  'transition.duration': 'transitionDuration',
+  'font.size': 'fontSize',
+  'font.weight': 'fontWeight',
+  'font.family': 'fontFamily',
+  'line.height': 'lineHeight',
+  'letter.spacing': 'letterSpacing',
+  'anchor.gutter': 'anchorGutter',
+  'icon.size': 'iconSize',
+  'disabled.opacity': 'disabledOpacity',
+  'form.field': 'formField',
+  'focus.ring': 'focusRing'
+};
+
+// Parent properties that might need transformation
+const TRANSFORM_PARENTS = new Set(['border', 'transition', 'font', 'line', 'letter', 'anchor', 'icon', 'disabled', 'form', 'focus']);
 
 function isShadowValue(value: any): value is ShadowValue {
   return (
@@ -55,50 +96,158 @@ function isShadowValue(value: any): value is ShadowValue {
   );
 }
 
-function processTokenValue(value: any, primitiveTokens: any): any {
-  // If it's a token object with $type and $value
-  if (value && typeof value === 'object' && '$type' in value && '$value' in value) {
-    const processedValue = value.$value;
-    
-    // Handle special types
-    switch (value.$type) {
-      case 'boxShadow':
-        if (Array.isArray(processedValue)) {
-          return processedValue
-            .filter(isShadowValue)
-            .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
-            .join(', ');
-        } else if (typeof processedValue === 'object' && processedValue !== null) {
-          if (isShadowValue(processedValue)) {
-            return `${processedValue.x} ${processedValue.y} ${processedValue.blur} ${processedValue.spread} ${processedValue.color}`;
-          }
-          return Object.values(processedValue)
-            .filter(isShadowValue)
-            .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
-            .join(', ');
-        }
-        break;
-      default:
-        return processTokenValue(processedValue, primitiveTokens);
+function processBoxShadow(value: any): string | undefined {
+  if (Array.isArray(value)) {
+    return value
+      .filter(isShadowValue)
+      .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
+      .join(', ');
+  } else if (typeof value === 'object' && value !== null) {
+    if (isShadowValue(value)) {
+      return `${value.x} ${value.y} ${value.blur} ${value.spread} ${value.color}`;
+    }
+    return Object.values(value)
+      .filter(isShadowValue)
+      .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
+      .join(', ');
+  }
+  return undefined;
+}
+
+function processFormField(field: any): ProcessedFormField {
+  const result: ProcessedFormField = {};
+
+  // Handle padding at the root level
+  if (field.padding) {
+    result.paddingX = field.padding.x?.$value || field.padding.x;
+    result.paddingY = field.padding.y?.$value || field.padding.y;
+  }
+
+  // Handle border radius
+  if (field.border?.radius?.$value) {
+    result.borderRadius = field.border.radius.$value;
+  } else if (field.borderRadius?.$value) {
+    result.borderRadius = field.borderRadius.$value;
+  }
+
+  // Handle transition duration
+  if (field.transition?.duration?.$value) {
+    result.transitionDuration = field.transition.duration.$value;
+  } else if (field.transitionDuration?.$value) {
+    result.transitionDuration = field.transitionDuration.$value;
+  }
+
+  // Handle focus ring
+  if (field.focus?.ring) {
+    result.focusRing = {
+      width: field.focus.ring.width?.$value || field.focus.ring.width,
+      style: field.focus.ring.style?.$value || field.focus.ring.style,
+      color: field.focus.ring.color?.$value || field.focus.ring.color,
+      offset: field.focus.ring.offset?.$value || field.focus.ring.offset,
+      shadow: processBoxShadow(field.focus.ring.shadow?.$value) || processBoxShadow(field.focus.ring.shadow)
+    };
+  }
+
+  // Handle size variants (sm, lg)
+  if (field.sm) {
+    result.sm = {
+      paddingX: field.sm.padding?.x?.$value || field.sm.padding?.x,
+      paddingY: field.sm.padding?.y?.$value || field.sm.padding?.y,
+      fontSize: field.sm.font?.size?.$value || field.sm.font?.size
+    };
+  }
+
+  if (field.lg) {
+    result.lg = {
+      paddingX: field.lg.padding?.x?.$value || field.lg.padding?.x,
+      paddingY: field.lg.padding?.y?.$value || field.lg.padding?.y,
+      fontSize: field.lg.font?.size?.$value || field.lg.font?.size
+    };
+  }
+
+  return result;
+}
+
+function processList(field: any): ProcessedList {
+  const result: ProcessedList = {};
+
+  if (field.padding) {
+    result.padding = field.padding.$value;
+  }
+
+  if (field.gap) {
+    result.gap = field.gap.$value;
+  }
+
+  if (field.header) {
+    result.header = {
+      padding: field.header.padding.$value
     }
   }
 
-  // If it's a string that might contain a reference
-  if (typeof value === 'string' && value.includes('{')) {
-    const match = value.match(/\{([^}]+)\}/);
-    if (!match) return value;
+  if (field.option) {
+    result.option = {
+      padding: field.option.padding.$value,
+      borderRadius: field.option.border.radius.$value
+    }
+    if (field.option.group) {
+      result.optionGroup = {
+        padding: field.option.group.padding.$value,
+        fontWeight: field.option.group.font.weight.$value
+      }
+    }
+  }
+  
+  return result;
+}
 
-    // Keep the reference as is
-    return value;
+function shouldTransform(path: string[]): boolean {
+  const pathStr = path.join('.');
+  return Object.keys(TOKEN_TRANSFORMATIONS).some(pattern => pathStr.endsWith(pattern));
+}
+
+function getTransformedKey(path: string[]): string {
+  const pathStr = path.join('.');
+  for (const [pattern, replacement] of Object.entries(TOKEN_TRANSFORMATIONS)) {
+    if (pathStr.endsWith(pattern)) {
+      return replacement;
+    }
+  }
+  return path[path.length - 1];
+}
+
+function processTokenValue(
+  token: Token | string | number | object | null | undefined, 
+  primitiveTokens: any,
+  currentPath: string[] = []
+): any {
+  // If token is null or undefined, return undefined
+  if (!token) return undefined;
+
+  // If it's a token object with $type and $value
+  if (typeof token === 'object' && '$type' in token && '$value' in token) {
+    const value = (token as Token).$value;
+    
+    switch ((token as Token).$type) {
+      case 'boxShadow':
+        return processBoxShadow(value);
+      default:
+        // For other types, just return the value
+        return value;
+    }
+  }
+
+  // If it's a reference string (e.g. "{primary.500}")
+  if (typeof token === 'string' && token.includes('{')) {
+    return token; // Keep references as is
   }
 
   // If it's a color value that could be referenced from primitive tokens
-  if (typeof value === 'string' && value.startsWith('#')) {
-    // Try to find a matching primitive token
+  if (typeof token === 'string' && token.startsWith('#')) {
     for (const [category, colors] of Object.entries(primitiveTokens || {})) {
       if (typeof colors === 'object' && colors !== null) {
         for (const [shade, colorValue] of Object.entries(colors)) {
-          if (colorValue === value) {
+          if (colorValue === token) {
             return `{${category}.${shade}}`;
           }
         }
@@ -106,352 +255,95 @@ function processTokenValue(value: any, primitiveTokens: any): any {
     }
   }
 
-  // For objects, process recursively
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    const processed: any = {};
-    for (const [key, val] of Object.entries(value)) {
-      const processedValue = processTokenValue(val, primitiveTokens);
-      if (processedValue !== undefined) {
-        // Special handling for border.radius in primitive tokens
-        if (key === 'border' && typeof val === 'object' && val !== null && 'radius' in val) {
-          processed.borderRadius = processedValue.radius;
-        } 
-        // Special handling for list option group
-        else if (key === 'option' && typeof val === 'object' && val !== null && 'group' in val) {
-          processed[key] = { ...processedValue };
-          delete processed[key].group;
-          const group = val.group as { padding?: any; font?: { weight?: any } };
-          if (group) {
-            processed.optionGroup = {
-              padding: group.padding ? processTokenValue(group.padding, primitiveTokens) : undefined,
-              fontWeight: group.font?.weight ? processTokenValue(group.font.weight, primitiveTokens) : undefined
-            };
+  // For objects, process each property recursively
+  if (typeof token === 'object' && !Array.isArray(token)) {
+    const result: any = {};
+    
+    for (const [key, value] of Object.entries(token)) {
+      const newPath = [...currentPath, key];
+      const pathStr = newPath.join('.');
+
+      if (pathStr === 'semantic.form') {
+        // Process form field and add it directly to result
+        const processedField = processFormField(value.field);
+        if (processedField) {
+          result.formField = processedField;
+        }
+      } else if (pathStr === 'semantic.list') {
+        const processedList = processList(value);
+        if (processedList) {
+          result.list = processedList;
+        }
+      } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
+        // Look ahead for transformable properties
+        for (const [childKey, childValue] of Object.entries(value)) {
+          const transformPath = [...newPath, childKey];
+          if (shouldTransform(transformPath)) {
+            // Process and store with transformed key
+            const transformedKey = getTransformedKey(transformPath);
+            const processed = processTokenValue(childValue as Token, primitiveTokens, transformPath);
+            if (processed !== undefined) {
+              result[transformedKey] = processed;
+            }
+          } else {
+            // Process normally if not a transformable property
+            const processed = processTokenValue(childValue as Token, primitiveTokens, transformPath);
+            if (processed !== undefined) {
+              if (!result[key]) result[key] = {};
+              result[key][childKey] = processed;
+            }
           }
         }
-        // Special handling for transition.duration
-        else if (key === 'transition' && typeof val === 'object' && val !== null && 'duration' in val) {
-          processed.transitionDuration = processTokenValue(val.duration, primitiveTokens);
-        }
-        // Special handling for navigation
-        else if (key === 'navigation' && typeof val === 'object' && val !== null) {
-          const navigation = val as {
-            item?: {
-              focus?: { background?: any; color?: any };
-              active?: { background?: any; color?: any };
-              color?: any;
-              icon?: { color?: any; focus?: { color?: any }; active?: { color?: any } };
-            };
-            submenu?: {
-              label?: { background?: any; color?: any };
-              icon?: { color?: any; focus?: { color?: any }; active?: { color?: any } };
-            };
-          };
-          processed[key] = {
-            item: navigation.item ? {
-              focusBackground: navigation.item.focus?.background ? processTokenValue(navigation.item.focus.background, primitiveTokens) : undefined,
-              activeBackground: navigation.item.active?.background ? processTokenValue(navigation.item.active.background, primitiveTokens) : undefined,
-              color: navigation.item.color ? processTokenValue(navigation.item.color, primitiveTokens) : undefined,
-              focusColor: navigation.item.focus?.color ? processTokenValue(navigation.item.focus.color, primitiveTokens) : undefined,
-              activeColor: navigation.item.active?.color ? processTokenValue(navigation.item.active.color, primitiveTokens) : undefined,
-              icon: navigation.item.icon ? {
-                color: navigation.item.icon.color ? processTokenValue(navigation.item.icon.color, primitiveTokens) : undefined,
-                focusColor: navigation.item.icon.focus?.color ? processTokenValue(navigation.item.icon.focus.color, primitiveTokens) : undefined,
-                activeColor: navigation.item.icon.active?.color ? processTokenValue(navigation.item.icon.active.color, primitiveTokens) : undefined
-              } : undefined
-            } : undefined,
-            submenuLabel: navigation.submenu?.label ? {
-              background: 'transparent',
-              color: navigation.submenu.label.color ? processTokenValue(navigation.submenu.label.color, primitiveTokens) : undefined
-            } : undefined,
-            submenuIcon: navigation.submenu?.icon ? {
-              color: navigation.submenu.icon.color ? processTokenValue(navigation.submenu.icon.color, primitiveTokens) : undefined,
-              focusColor: navigation.submenu.icon.focus?.color ? processTokenValue(navigation.submenu.icon.focus.color, primitiveTokens) : undefined,
-              activeColor: navigation.submenu.icon.active?.color ? processTokenValue(navigation.submenu.icon.active.color, primitiveTokens) : undefined
-            } : undefined
-          };
-        }
-        // Special handling for primary colors in colorScheme
-        else if (key === 'primary' && typeof val === 'object' && val !== null) {
-          const primary = val as {
-            color?: any;
-            contrast?: { color?: any };
-            hover?: { color?: any };
-            active?: { color?: any };
-          };
-          processed[key] = {
-            color: primary.color ? processTokenValue(primary.color, primitiveTokens) : undefined,
-            contrastColor: primary.contrast?.color ? processTokenValue(primary.contrast.color, primitiveTokens) : undefined,
-            hoverColor: primary.hover?.color ? processTokenValue(primary.hover.color, primitiveTokens) : undefined,
-            activeColor: primary.active?.color ? processTokenValue(primary.active.color, primitiveTokens) : undefined
-          };
-        }
-        // Special handling for highlight colors
-        else if (key === 'highlight' && typeof val === 'object' && val !== null) {
-          const highlight = val as {
-            background?: any;
-            focus?: { background?: any; color?: any };
-            color?: any;
-          };
-          processed[key] = {
-            backgroundColor: highlight.background ? processTokenValue(highlight.background, primitiveTokens) : undefined,
-            focusBackgroundColor: highlight.focus?.background ? processTokenValue(highlight.focus.background, primitiveTokens) : undefined,
-            focusColor: highlight.focus?.color ? processTokenValue(highlight.focus.color, primitiveTokens) : undefined,
-            color: highlight.color ? processTokenValue(highlight.color, primitiveTokens) : undefined
-          };
-        }
-        // Special handling for content
-        else if (key === 'content' && typeof val === 'object' && val !== null) {
-          const content = val as {
-            background?: any;
-            hover?: { background?: any; color?: any };
-            border?: { color?: any };
-            color?: any;
-          };
-          processed[key] = {
-            background: content.background ? processTokenValue(content.background, primitiveTokens) : undefined,
-            hoverBackground: content.hover?.background ? processTokenValue(content.hover.background, primitiveTokens) : undefined,
-            borderColor: content.border?.color ? processTokenValue(content.border.color, primitiveTokens) : undefined,
-            color: content.color ? processTokenValue(content.color, primitiveTokens) : undefined,
-            hoverColor: content.hover?.color ? processTokenValue(content.hover.color, primitiveTokens) : undefined
-          };
-        }
-        // Special handling for text
-        else if (key === 'text' && typeof val === 'object' && val !== null) {
-          const text = val as {
-            color?: any;
-            hover?: { color?: any; muted?: { color?: any } };
-            muted?: { color?: any };
-          };
-          processed[key] = {
-            color: text.color ? processTokenValue(text.color, primitiveTokens) : undefined,
-            hoverColor: text.hover?.color ? processTokenValue(text.hover.color, primitiveTokens) : undefined,
-            mutedColor: text.muted?.color ? processTokenValue(text.muted.color, primitiveTokens) : undefined,
-            hoverMutedColor: text.hover?.muted?.color ? processTokenValue(text.hover.muted.color, primitiveTokens) : undefined
-          };
-        }
-        // Special handling for form field in colorScheme
-        else if (key === 'form' && typeof val === 'object' && val !== null && 'field' in val) {
-          const field = val.field as {
-            background?: any;
-            disabled?: { background?: any; color?: any };
-            filled?: { background?: any; focus?: { background?: any }; hover?: { background?: any } };
-            border?: { color?: any };
-            hover?: { border?: { color?: any } };
-            focus?: { border?: { color?: any } };
-            invalid?: { border?: { color?: any }; placeholder?: { color?: any } };
-            color?: any;
-            placeholder?: { color?: any };
-            float?: { label?: { color?: any; focus?: { color?: any }; invalid?: { color?: any } } };
-            icon?: { color?: any };
-            shadow?: any;
-          };
-          processed.formField = {
-            background: field.background ? processTokenValue(field.background, primitiveTokens) : undefined,
-            disabledBackground: field.disabled?.background ? processTokenValue(field.disabled.background, primitiveTokens) : undefined,
-            filledBackground: field.filled?.background ? processTokenValue(field.filled.background, primitiveTokens) : undefined,
-            filledFocusBackground: field.filled?.focus?.background ? processTokenValue(field.filled.focus.background, primitiveTokens) : undefined,
-            borderColor: field.border?.color ? processTokenValue(field.border.color, primitiveTokens) : undefined,
-            hoverBorderColor: field.hover?.border?.color ? processTokenValue(field.hover.border.color, primitiveTokens) : undefined,
-            focusBorderColor: field.focus?.border?.color ? processTokenValue(field.focus.border.color, primitiveTokens) : undefined,
-            invalidBorderColor: field.invalid?.border?.color ? processTokenValue(field.invalid.border.color, primitiveTokens) : undefined,
-            color: field.color ? processTokenValue(field.color, primitiveTokens) : undefined,
-            disabledColor: field.disabled?.color ? processTokenValue(field.disabled.color, primitiveTokens) : undefined,
-            placeholderColor: field.placeholder?.color ? processTokenValue(field.placeholder.color, primitiveTokens) : undefined,
-            floatLabelColor: field.float?.label?.color ? processTokenValue(field.float.label.color, primitiveTokens) : undefined,
-            floatLabelFocusColor: field.float?.label?.focus?.color ? processTokenValue(field.float.label.focus.color, primitiveTokens) : undefined,
-            floatLabelInvalidColor: field.float?.label?.invalid?.color ? processTokenValue(field.float.label.invalid.color, primitiveTokens) : undefined,
-            iconColor: field.icon?.color ? processTokenValue(field.icon.color, primitiveTokens) : undefined,
-            shadow: field.shadow ? processTokenValue(field.shadow, primitiveTokens) : undefined
-          };
-        }
-        // Special handling for overlay
-        else if (key === 'overlay' && typeof val === 'object' && val !== null) {
-          const overlay = val as {
-            select?: { background?: any; border?: { color?: any }; color?: any };
-            popover?: { background?: any; border?: { color?: any }; color?: any };
-            modal?: { background?: any; border?: { color?: any }; color?: any };
-          };
-          processed[key] = {
-            select: overlay.select ? {
-              background: overlay.select.background ? processTokenValue(overlay.select.background, primitiveTokens) : undefined,
-              borderColor: 'transparent',
-              color: overlay.select.color ? processTokenValue(overlay.select.color, primitiveTokens) : undefined
-            } : undefined,
-            popover: overlay.popover ? {
-              background: overlay.popover.background ? processTokenValue(overlay.popover.background, primitiveTokens) : undefined,
-              borderColor: 'transparent',
-              color: overlay.popover.color ? processTokenValue(overlay.popover.color, primitiveTokens) : undefined
-            } : undefined,
-            modal: overlay.modal ? {
-              background: overlay.modal.background ? processTokenValue(overlay.modal.background, primitiveTokens) : undefined,
-              borderColor: 'transparent',
-              color: overlay.modal.color ? processTokenValue(overlay.modal.color, primitiveTokens) : undefined
-            } : undefined
-          };
-        }
-        // Special handling for list
-        else if (key === 'list' && typeof val === 'object' && val !== null) {
-          const list = val as {
-            option?: {
-              focus?: { background?: any; color?: any };
-              selected?: { background?: any; focus?: { background?: any; color?: any }; color?: any };
-              color?: any;
-              icon?: { color?: any; focus?: { color?: any } };
-              group?: { background?: any; color?: any };
-            };
-          };
-          processed[key] = {
-            option: list.option ? {
-              focusBackground: list.option.focus?.background ? processTokenValue(list.option.focus.background, primitiveTokens) : undefined,
-              selectedBackground: list.option.selected?.background ? processTokenValue(list.option.selected.background, primitiveTokens) : undefined,
-              selectedFocusBackground: list.option.selected?.focus?.background ? processTokenValue(list.option.selected.focus.background, primitiveTokens) : undefined,
-              color: list.option.color ? processTokenValue(list.option.color, primitiveTokens) : undefined,
-              focusColor: list.option.focus?.color ? processTokenValue(list.option.focus.color, primitiveTokens) : undefined,
-              selectedColor: list.option.selected?.color ? processTokenValue(list.option.selected.color, primitiveTokens) : undefined,
-              selectedFocusColor: list.option.selected?.focus?.color ? processTokenValue(list.option.selected.focus.color, primitiveTokens) : undefined,
-              icon: list.option.icon ? {
-                color: list.option.icon.color ? processTokenValue(list.option.icon.color, primitiveTokens) : undefined,
-                focusColor: list.option.icon.focus?.color ? processTokenValue(list.option.icon.focus.color, primitiveTokens) : undefined
-              } : undefined
-            } : undefined,
-            optionGroup: list.option?.group ? {
-              background: 'transparent',
-              color: list.option.group.color ? processTokenValue(list.option.group.color, primitiveTokens) : undefined
-            } : undefined
-          };
-        }
-        else {
-          processed[key] = processedValue;
+      } else if (!shouldTransform(newPath)) {
+        // Normal processing for non-transformable properties
+        const processed = processTokenValue(value, primitiveTokens, newPath);
+        if (processed !== undefined) {
+          result[key] = processed;
         }
       }
     }
-    return Object.keys(processed).length > 0 ? processed : undefined;
-  }
-
-  return value;
-}
-
-function processFormField(formField: any): ProcessedFormField {
-  const processed: ProcessedFormField = {};
-
-  // Process padding
-  if (formField.padding?.x?.$value) processed.paddingX = formField.padding.x.$value;
-  if (formField.padding?.y?.$value) processed.paddingY = formField.padding.y.$value;
-
-  // Process border radius
-  if (formField.border?.radius?.$value) processed.borderRadius = formField.border.radius.$value;
-
-  // Process font size
-  if (formField.font?.size?.$value) processed.fontSize = formField.font.size.$value;
-
-  // Process transition duration
-  if (formField.transition?.duration?.$value) processed.transitionDuration = formField.transition.duration.$value;
-
-  // Process focus ring
-  if (formField.focus?.ring) {
-    const ring = formField.focus.ring;
-    const focusRing: any = {};
-
-    if (ring.width?.$value) focusRing.width = ring.width.$value;
-    if (ring.style?.$value) focusRing.style = ring.style.$value;
-    if (ring.color?.$value) focusRing.color = ring.color.$value;
-    if (ring.offset?.$value) focusRing.offset = ring.offset.$value;
-    if (ring.shadow?.$value) {
-      const shadowValue = ring.shadow.$value;
-      if (shadowValue && typeof shadowValue === 'object' && 'x' in shadowValue && 'y' in shadowValue && 'blur' in shadowValue && 'spread' in shadowValue && 'color' in shadowValue) {
-        focusRing.shadow = `${shadowValue.x} ${shadowValue.y} ${shadowValue.blur} ${shadowValue.spread} ${shadowValue.color}`;
-      }
-    }
-
-    if (Object.keys(focusRing).length > 0) {
-      processed.focusRing = focusRing;
-    }
-  }
-
-  // Process variants
-  if (formField.sm) {
-    const sm: any = {};
-    if (formField.sm.padding?.x?.$value) sm.paddingX = formField.sm.padding.x.$value;
-    if (formField.sm.padding?.y?.$value) sm.paddingY = formField.sm.padding.y.$value;
-    if (formField.sm.font?.size?.$value) sm.fontSize = formField.sm.font.size.$value;
-    if (Object.keys(sm).length > 0) processed.sm = sm;
-  }
-
-  if (formField.lg) {
-    const lg: any = {};
-    if (formField.lg.padding?.x?.$value) lg.paddingX = formField.lg.padding.x.$value;
-    if (formField.lg.padding?.y?.$value) lg.paddingY = formField.lg.padding.y.$value;
-    if (formField.lg.font?.size?.$value) lg.fontSize = formField.lg.font.size.$value;
-    if (Object.keys(lg).length > 0) processed.lg = lg;
-  }
-
-  return processed;
-}
-
-function generateTheme(tokens: any): any {
-  const primitiveTokens = tokens['aura/primitive'];
-  const result: any = { primitive: {}, semantic: {} };
-
-  // Process primitive tokens
-  if (primitiveTokens) {
-    result.primitive = processTokenValue(primitiveTokens, primitiveTokens);
-  }
-
-  // Process semantic tokens
-  const semanticTokens = tokens['aura/semantic'];
-  if (semanticTokens) {
-    // Extract and process special properties
-    if (semanticTokens.form?.field) {
-      result.semantic.formField = processFormField(semanticTokens.form.field);
-    }
-
-    // Process other semantic tokens
-    const processed = processTokenValue(semanticTokens, primitiveTokens);
     
-    // Extract flattened properties
-    result.semantic = {
-      ...result.semantic,
-      transitionDuration: processed.transition?.duration?.$value || processed.transition?.duration,
-      disabledOpacity: processed.disabled?.opacity?.$value || processed.disabled?.opacity,
-      iconSize: processed.icon?.size?.$value || processed.icon?.size,
-      anchorGutter: processed.anchor?.gutter?.$value || processed.anchor?.gutter,
-      focusRing: {
-        width: processed.focus?.ring?.width?.$value || processed.focus?.ring?.width,
-        style: processed.focus?.ring?.style?.$value || processed.focus?.ring?.style,
-        color: processed.focus?.ring?.color?.$value || processed.focus?.ring?.color,
-        offset: processed.focus?.ring?.offset?.$value || processed.focus?.ring?.offset,
-        shadow: processed.focus?.ring?.shadow?.$value || processed.focus?.ring?.shadow,
-        stroke: processed.focus?.ring?.stroke
-      },
-      ...processed
-    };
-
-    // Clean up nested properties that were flattened
-    delete result.semantic.transition?.duration;
-    delete result.semantic.disabled?.opacity;
-    delete result.semantic.icon?.size;
-    delete result.semantic.anchor?.gutter;
-    delete result.semantic.form?.field;
-    delete result.semantic.focus?.ring;
-
-    // Clean up empty objects
-    ['transition', 'disabled', 'icon', 'anchor', 'form', 'focus'].forEach(key => {
-      if (result.semantic[key] && Object.keys(result.semantic[key]).length === 0) {
-        delete result.semantic[key];
-      }
-    });
+    return result;
   }
 
-  // Process color schemes
-  ['light', 'dark'].forEach(theme => {
-    const themeTokens = tokens[`aura/semantic/${theme}`];
-    if (themeTokens) {
-      if (!result.semantic.colorScheme) result.semantic.colorScheme = {};
-      result.semantic.colorScheme[theme] = processTokenValue(themeTokens, primitiveTokens);
-    }
-  });
+  // Return primitive values as is
+  return token;
+}
 
-  return result;
+function processPrimitiveTokens(tokens: any): any {
+  const primitiveTokens = tokens['aura/primitive'];
+  return primitiveTokens ? processTokenValue(primitiveTokens, primitiveTokens, ['primitive']) : {};
+}
+
+function processSemanticTokens(tokens: any, primitiveTokens: any): any {
+  const semanticTokens = tokens['aura/semantic'];
+  return semanticTokens ? processTokenValue(semanticTokens, primitiveTokens, ['semantic']) : {};
+}
+
+function processColorScheme(tokens: any, primitiveTokens: any): { light: any; dark: any } {
+  return {
+    light: processTokenValue(tokens['aura/semantic/light'], primitiveTokens, ['semantic', 'light']),
+    dark: processTokenValue(tokens['aura/semantic/dark'], primitiveTokens, ['semantic', 'dark'])
+  };
+}
+
+function generateTheme(tokens: any): TokenSet {
+  // Process each section separately
+  const primitive = processPrimitiveTokens(tokens);
+  const semantic = processSemanticTokens(tokens, primitive);
+  const { light, dark } = processColorScheme(tokens, primitive);
+
+  // Combine into final theme structure
+  return {
+    primitive,
+    semantic: {
+      ...semantic,
+      colorScheme: {
+        light,
+        dark
+      }
+    }
+  };
 }
 
 function formatObject(obj: any, indent = 0): string {
