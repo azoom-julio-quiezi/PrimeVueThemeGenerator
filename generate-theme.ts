@@ -23,28 +23,46 @@ interface ShadowValue {
   type: 'dropShadow';
 }
 interface ProcessedFormField {
-  paddingX?: string;
-  paddingY?: string;
+  background?: string;
+  borderColor?: string;
   borderRadius?: string;
-  fontSize?: string;
-  transitionDuration?: string;
+  color?: string;
+  disabledBackground?: string;
+  disabledColor?: string;
+  filledBackground?: string;
+  filledFocusBackground?: string;
+  filledHoverBackground?: string;
+  floatLabelColor?: string;
+  floatLabelFocusColor?: string;
+  floatLabelInvalidColor?: string;
+  focusBorderColor?: string;
   focusRing?: {
-    width?: string;
-    style?: string;
     color?: string;
     offset?: string;
     shadow?: string;
+    style?: string;
+    width?: string;
   };
-  sm?: {
-    paddingX?: string;
-    paddingY?: string;
-    fontSize?: string;
-  };
+  fontSize?: string;
+  hoverBorderColor?: string;
+  iconColor?: string;
+  invalidBorderColor?: string;
+  invalidPlaceholderColor?: string;
   lg?: {
+    fontSize?: string;
     paddingX?: string;
     paddingY?: string;
-    fontSize?: string;
   };
+  paddingX?: string;
+  paddingY?: string;
+  placeholderColor?: string;
+  shadow?: string;
+  sm?: {
+    fontSize?: string;
+    paddingX?: string;
+    paddingY?: string;
+  };
+  transitionDuration?: string;
 }
 
 interface ProcessedList {
@@ -63,24 +81,24 @@ interface ProcessedList {
   }
 }
 
-// Special token transformations mapping
-const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
-  'border.radius': 'borderRadius',
-  'transition.duration': 'transitionDuration',
-  'font.size': 'fontSize',
-  'font.weight': 'fontWeight',
-  'font.family': 'fontFamily',
-  'line.height': 'lineHeight',
-  'letter.spacing': 'letterSpacing',
-  'anchor.gutter': 'anchorGutter',
-  'icon.size': 'iconSize',
-  'disabled.opacity': 'disabledOpacity',
-  'form.field': 'formField',
-  'focus.ring': 'focusRing'
-};
-
-// Parent properties that might need transformation
-const TRANSFORM_PARENTS = new Set(['border', 'transition', 'font', 'line', 'letter', 'anchor', 'icon', 'disabled', 'form', 'focus']);
+interface ProcessedNavigation {
+  list?: {
+    padding?: string;
+    gap?: string;
+  }
+  item?: {
+    padding?: string;
+    borderRadius?: string;
+    gap?: string;
+  }
+  submenuLabel?: {
+    padding?: string;
+    fontWeight?: string;
+  }
+  submenuIconSize?: {
+    size?: string;
+  }
+}
 
 function isShadowValue(value: any): value is ShadowValue {
   return (
@@ -117,52 +135,154 @@ function processBoxShadow(value: any): string | undefined {
 function processFormField(field: any): ProcessedFormField {
   const result: ProcessedFormField = {};
 
-  // Handle padding at the root level
-  if (field.padding) {
-    result.paddingX = field.padding.x?.$value || field.padding.x;
-    result.paddingY = field.padding.y?.$value || field.padding.y;
+  const background = field.background?.$value || field.background;
+  if (background !== undefined) {
+    result.background = background;
   }
 
-  // Handle border radius
-  if (field.border?.radius?.$value) {
-    result.borderRadius = field.border.radius.$value;
-  } else if (field.borderRadius?.$value) {
-    result.borderRadius = field.borderRadius.$value;
+  const borderColor = field.border?.color?.$value;
+  if (borderColor !== undefined) {
+    result.borderColor = borderColor;
   }
 
-  // Handle transition duration
-  if (field.transition?.duration?.$value) {
-    result.transitionDuration = field.transition.duration.$value;
-  } else if (field.transitionDuration?.$value) {
-    result.transitionDuration = field.transitionDuration.$value;
+  const borderRadius = field.border?.radius?.$value || field.borderRadius?.$value;
+  if (borderRadius !== undefined) {
+    result.borderRadius = borderRadius;
   }
 
-  // Handle focus ring
+  const color = field.color?.$value || field.color;
+  if (color !== undefined) {
+    result.color = color;
+  }
+
+  const disabledBackground = field.disabled?.background?.$value || field.disabled?.background;
+  if (disabledBackground !== undefined) {
+    result.disabledBackground = disabledBackground;
+  }
+
+  const disabledColor = field.disabled?.color?.$value || field.disabled?.color;
+  if (disabledColor !== undefined) {
+    result.disabledColor = disabledColor;
+  }
+
+  const filledBackground = field.filled?.background?.$value || field.filled?.background;
+  if (filledBackground !== undefined) {
+    result.filledBackground = filledBackground;
+  }
+
+  const filledFocusBackground = field.filled?.focus?.background?.$value || field.filled?.focus?.background;
+  if (filledFocusBackground !== undefined) {
+    result.filledFocusBackground = filledFocusBackground;
+  }
+
+  const filledHoverBackground = field.filled?.hover?.background?.$value || field.filled?.hover?.background; 
+  if (filledHoverBackground !== undefined) {
+    result.filledHoverBackground = filledHoverBackground;
+  }
+
+  const floatLabelColor = field.float?.label?.color?.$value || field.float?.label?.color;
+  if (floatLabelColor !== undefined) {
+    result.floatLabelColor = floatLabelColor;
+  }
+
+  const floatLabelFocusColor = field.float?.label?.focus?.color?.$value || field.float?.label?.focus?.color;  
+  if (floatLabelFocusColor !== undefined) {
+    result.floatLabelFocusColor = floatLabelFocusColor;
+  }
+
+  const floatLabelInvalidColor = field.float?.label?.invalid?.color?.$value || field.float?.label?.invalid?.color;
+  if (floatLabelInvalidColor !== undefined) {
+    result.floatLabelInvalidColor = floatLabelInvalidColor;
+  }
+
+  const focusBorderColor = field.focus?.border?.color?.$value;
+  if (focusBorderColor !== undefined) {
+    result.focusBorderColor = focusBorderColor;
+  }
+
   if (field.focus?.ring) {
-    result.focusRing = {
+    const focusRingProps = {
       width: field.focus.ring.width?.$value || field.focus.ring.width,
       style: field.focus.ring.style?.$value || field.focus.ring.style,
       color: field.focus.ring.color?.$value || field.focus.ring.color,
       offset: field.focus.ring.offset?.$value || field.focus.ring.offset,
       shadow: processBoxShadow(field.focus.ring.shadow?.$value) || processBoxShadow(field.focus.ring.shadow)
     };
+    if (Object.values(focusRingProps).some(v => v !== undefined)) {
+      result.focusRing = focusRingProps;
+    }
   }
 
-  // Handle size variants (sm, lg)
-  if (field.sm) {
-    result.sm = {
-      paddingX: field.sm.padding?.x?.$value || field.sm.padding?.x,
-      paddingY: field.sm.padding?.y?.$value || field.sm.padding?.y,
-      fontSize: field.sm.font?.size?.$value || field.sm.font?.size
-    };
+  const fontSize = field.font?.size?.$value || field.fontSize?.$value;
+  if (fontSize !== undefined) {
+    result.fontSize = fontSize;
+  }
+
+  const hoverBorderColor = field.hover?.border?.color?.$value || field.hover?.borderColor;
+  if (hoverBorderColor !== undefined) {
+    result.hoverBorderColor = hoverBorderColor;
+  }
+
+  const iconColor = field.icon?.color?.$value || field.icon?.color;
+  if (iconColor !== undefined) {
+    result.iconColor = iconColor;
+  }
+
+  const invalidBorderColor = field.invalid?.border?.color?.$value || field.invalid?.borderColor;
+  if (invalidBorderColor !== undefined) {
+    result.invalidBorderColor = invalidBorderColor;
+  }
+
+  const invalidPlaceholderColor = field.invalid?.placeholder?.color?.$value || field.invalid?.placeholder?.color;
+  if (invalidPlaceholderColor !== undefined) {
+    result.invalidPlaceholderColor = invalidPlaceholderColor;
   }
 
   if (field.lg) {
-    result.lg = {
+    const lgProps = {
       paddingX: field.lg.padding?.x?.$value || field.lg.padding?.x,
       paddingY: field.lg.padding?.y?.$value || field.lg.padding?.y,
       fontSize: field.lg.font?.size?.$value || field.lg.font?.size
     };
+    if (Object.values(lgProps).some(v => v !== undefined)) {
+      result.lg = lgProps;
+    }
+  }
+
+  const paddingX = field.padding?.x?.$value || field.padding?.x;
+  if (paddingX !== undefined) {
+    result.paddingX = paddingX;
+  }
+
+  const paddingY = field.padding?.y?.$value || field.padding?.y;
+  if (paddingY !== undefined) {
+    result.paddingY = paddingY;
+  } 
+
+  const placeholderColor = field.placeholder?.color?.$value || field.placeholder?.color;
+  if (placeholderColor !== undefined) {
+    result.placeholderColor = placeholderColor;
+  }
+
+  const shadow = field.shadow?.$value || field.shadow;
+  if (shadow !== undefined) {
+    result.shadow = processBoxShadow(field.shadow?.$value) || processBoxShadow(field.shadow)
+  }
+
+  if (field.sm) {
+    const smProps = {
+      paddingX: field.sm.padding?.x?.$value || field.sm.padding?.x,
+      paddingY: field.sm.padding?.y?.$value || field.sm.padding?.y,
+      fontSize: field.sm.font?.size?.$value || field.sm.font?.size
+    };
+    if (Object.values(smProps).some(v => v !== undefined)) {
+      result.sm = smProps;
+    }
+  }
+
+  const transitionDuration = field.transition?.duration?.$value || field.transitionDuration?.$value;
+  if (transitionDuration !== undefined) {
+    result.transitionDuration = transitionDuration;
   }
 
   return result;
@@ -171,29 +291,36 @@ function processFormField(field: any): ProcessedFormField {
 function processList(field: any): ProcessedList {
   const result: ProcessedList = {};
 
-  if (field.padding) {
+  if (field.padding?.$value !== undefined) {
     result.padding = field.padding.$value;
   }
 
-  if (field.gap) {
+  if (field.gap?.$value !== undefined) {
     result.gap = field.gap.$value;
   }
 
-  if (field.header) {
+  if (field.header?.padding?.$value !== undefined) {
     result.header = {
       padding: field.header.padding.$value
-    }
+    };
   }
 
   if (field.option) {
-    result.option = {
-      padding: field.option.padding.$value,
-      borderRadius: field.option.border.radius.$value
+    const optionProps = {
+      padding: field.option.padding?.$value,
+      borderRadius: field.option.border?.radius?.$value
+    };
+    if (Object.values(optionProps).some(v => v !== undefined)) {
+      result.option = optionProps;
     }
+
     if (field.option.group) {
-      result.optionGroup = {
-        padding: field.option.group.padding.$value,
-        fontWeight: field.option.group.font.weight.$value
+      const groupProps = {
+        padding: field.option.group.padding?.$value,
+        fontWeight: field.option.group.font?.weight?.$value
+      };
+      if (Object.values(groupProps).some(v => v !== undefined)) {
+        result.optionGroup = groupProps;
       }
     }
   }
@@ -201,6 +328,69 @@ function processList(field: any): ProcessedList {
   return result;
 }
 
+function processNavigation(field: any): ProcessedNavigation {
+  const result: ProcessedNavigation = {};
+
+  if (field.list) {
+    const listProps = {
+      padding: field.list.padding?.$value,
+      gap: field.list.gap?.$value
+    };
+    if (Object.values(listProps).some(v => v !== undefined)) {
+      result.list = listProps;
+    }
+  }
+
+  if (field.item) {
+    const itemProps = {
+      padding: field.item.padding?.$value,
+      borderRadius: field.item.border?.radius?.$value,
+      gap: field.item.gap?.$value
+    };
+    if (Object.values(itemProps).some(v => v !== undefined)) {
+      result.item = itemProps;
+    }
+  }
+
+  if (field.submenu?.label) {
+    const labelProps = {
+      padding: field.submenu.label.padding?.$value,
+      fontWeight: field.submenu.label.font?.weight?.$value
+    };
+    if (Object.values(labelProps).some(v => v !== undefined)) {
+      result.submenuLabel = labelProps;
+    }
+  }
+
+  if (field.submenu?.icon?.size?.$value !== undefined) {
+    result.submenuIconSize = {
+      size: field.submenu.icon.size.$value
+    };
+  }
+
+  return result;
+}
+  
+// Special token transformations mapping
+const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
+  'active.color': 'activeColor',
+  'anchor.gutter': 'anchorGutter',
+  'border.color': 'borderColor',
+  'border.radius': 'borderRadius',
+  'contrast.color': 'contrastColor',
+  'disabled.opacity': 'disabledOpacity',
+  'focus.background': 'focusBackground',
+  'focus.color': 'focusColor',
+  'focus.ring': 'focusRing',
+  'form.field': 'formField',
+  'hover.color': 'hoverColor',
+  'icon.size': 'iconSize',
+  'transition.duration': 'transitionDuration'
+};
+
+// Parent properties that might need transformation
+const TRANSFORM_PARENTS = new Set(['active', 'anchor', 'border', 'contrast', 'disabled', 'focus', 'form', 'hover', 'icon', 'transition']);
+  
 function shouldTransform(path: string[]): boolean {
   const pathStr = path.join('.');
   return Object.keys(TOKEN_TRANSFORMATIONS).some(pattern => pathStr.endsWith(pattern));
@@ -214,6 +404,45 @@ function getTransformedKey(path: string[]): string {
     }
   }
   return path[path.length - 1];
+}
+
+function processTransformableObject(
+  obj: any,
+  currentPath: string[],
+  result: any,
+  primitiveTokens: any
+): void {
+  if (!obj || typeof obj !== 'object') return;
+
+  for (const [key, value] of Object.entries(obj)) {
+    const newPath = [...currentPath, key];
+    const pathStr = newPath.join('.');
+
+    // Check if this path needs transformation
+    if (shouldTransform(newPath)) {
+      const transformedKey = getTransformedKey(newPath);
+      const processed = processTokenValue(value as Token, primitiveTokens, newPath);
+      if (processed !== undefined) {
+        result[transformedKey] = processed;
+      }
+    } else if (typeof value === 'object' && value !== null) {
+      // Recursively process nested objects
+      processTransformableObject(value, newPath, result, primitiveTokens);
+    } else {
+      // Process non-transformable values
+      const processed = processTokenValue(value as Token | string | number | object | null | undefined, primitiveTokens, newPath);
+      if (processed !== undefined) {
+        let current = result;
+        for (let i = 0; i < currentPath.length; i++) {
+          if (!current[currentPath[i]]) {
+            current[currentPath[i]] = {};
+          }
+          current = current[currentPath[i]];
+        }
+        current[key] = processed;
+      }
+    }
+  }
 }
 
 function processTokenValue(
@@ -263,8 +492,7 @@ function processTokenValue(
       const newPath = [...currentPath, key];
       const pathStr = newPath.join('.');
 
-      if (pathStr === 'semantic.form') {
-        // Process form field and add it directly to result
+      if (pathStr === 'semantic.form' || pathStr === 'semantic.light.form' || pathStr === 'semantic.dark.form') {
         const processedField = processFormField(value.field);
         if (processedField) {
           result.formField = processedField;
@@ -274,26 +502,14 @@ function processTokenValue(
         if (processedList) {
           result.list = processedList;
         }
-      } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
-        // Look ahead for transformable properties
-        for (const [childKey, childValue] of Object.entries(value)) {
-          const transformPath = [...newPath, childKey];
-          if (shouldTransform(transformPath)) {
-            // Process and store with transformed key
-            const transformedKey = getTransformedKey(transformPath);
-            const processed = processTokenValue(childValue as Token, primitiveTokens, transformPath);
-            if (processed !== undefined) {
-              result[transformedKey] = processed;
-            }
-          } else {
-            // Process normally if not a transformable property
-            const processed = processTokenValue(childValue as Token, primitiveTokens, transformPath);
-            if (processed !== undefined) {
-              if (!result[key]) result[key] = {};
-              result[key][childKey] = processed;
-            }
-          }
+      } else if (pathStr === 'semantic.navigation') {
+        const processedNavigation = processNavigation(value);
+        if (processedNavigation) {
+          result.navigation = processedNavigation;
         }
+      } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
+        // Process transformable object recursively
+        processTransformableObject(value, newPath, result, primitiveTokens);
       } else if (!shouldTransform(newPath)) {
         // Normal processing for non-transformable properties
         const processed = processTokenValue(value, primitiveTokens, newPath);
