@@ -74,6 +74,10 @@ interface ProcessedList {
   option?: {
     padding?: string;
     borderRadius?: string;
+    icon?: {
+      color?: string;
+      focusColor?: string;
+    }
   }
   optionGroup?: {
     padding?: string;
@@ -312,7 +316,7 @@ function processList(field: any): ProcessedList {
   }
 
   if (field.option) {
-    const optionProps = {
+    const optionProps: any = {
       borderRadius: field.option.border?.radius?.$value,
       focusBackground: field.option.focus?.background?.$value,
       selectedBackground: field.option.selected?.background?.$value,
@@ -321,14 +325,22 @@ function processList(field: any): ProcessedList {
       focusColor: field.option.focus?.color?.$value,
       selectedColor: field.option.selected?.color?.$value,
       selectedFocusColor: field.option.selected?.focus?.color?.$value,
-      padding: field.option.padding?.$value,
-      icon: {
-        color: field.option.icon?.color?.$value,
-        focusColor: field.option.icon?.focus?.color?.$value
-      }
+      padding: field.option.padding?.$value
     };
-    if (Object.values(optionProps).some(v => v !== undefined) || 
-        (optionProps.icon && Object.values(optionProps.icon).some(v => v !== undefined))) {
+
+    if (field.option?.icon) {
+      const iconColor = field.option.icon?.color?.$value;
+      const iconFocusColor = field.option.icon?.focus?.color?.$value;
+      
+      if (iconColor !== undefined || iconFocusColor !== undefined) {
+        optionProps.icon = {
+          color: iconColor,
+          focusColor: iconFocusColor
+        };
+      }
+    }
+
+    if (Object.values(optionProps).some(v => v !== undefined)) {
       result.option = optionProps;
     }
 
@@ -362,7 +374,7 @@ function processNavigation(field: any): ProcessedNavigation {
   }
 
   if (field.item) {
-    const itemProps = {
+    const itemProps: any = {
       padding: field.item.padding?.$value,
       borderRadius: field.item.border?.radius?.$value,
       gap: field.item.gap?.$value,
@@ -370,14 +382,22 @@ function processNavigation(field: any): ProcessedNavigation {
       activeBackground: field.item.active?.background?.$value,
       color: field.item.color?.$value,
       focusColor: field.item.focus?.color?.$value,
-      activeColor: field.item.active?.color?.$value,
-      icon: {
-        color: field.item.icon?.color?.$value,
-        focusColor: field.item.icon?.focus?.color?.$value
-      }
+      activeColor: field.item.active?.color?.$value
     };
-    if (Object.values(itemProps).some(v => v !== undefined) || 
-        (itemProps.icon && Object.values(itemProps.icon).some(v => v !== undefined))) {
+
+    if (field.item?.icon) {
+      const iconColor = field.item.icon?.color?.$value;
+      const iconFocusColor = field.item.icon?.focus?.color?.$value;
+      
+      if (iconColor !== undefined || iconFocusColor !== undefined) {
+        itemProps.icon = {
+          color: iconColor,
+          focusColor: iconFocusColor
+        };
+      }
+    }
+
+    if (Object.values(itemProps).some(v => v !== undefined)) {
       result.item = itemProps;
     }
   }
@@ -416,6 +436,7 @@ const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
   'border.color': 'borderColor',
   'border.radius': 'borderRadius',
   'contrast.color': 'contrastColor',
+  'disabled.color': 'disabledColor',
   'disabled.opacity': 'disabledOpacity',
   'focus.background': 'focusBackground',
   'focus.color': 'focusColor',
@@ -447,41 +468,37 @@ function getTransformedKey(path: string[]): string {
   return path[path.length - 1];
 }
 
-function processTransformableObject(
-  obj: any,
+function processTransformableToken(
+  tokenKey: string,
+  tokenValue: any,
   currentPath: string[],
   result: any,
   primitiveTokens: any
 ): void {
-  if (!obj || typeof obj !== 'object') return;
+  if (!tokenValue || typeof tokenValue !== 'object') return;
 
-  for (const [key, value] of Object.entries(obj)) {
+  for (const [key, value] of Object.entries(tokenValue)) {
     const newPath = [...currentPath, key];
-    const pathStr = newPath.join('.');
 
-    // Check if this path needs transformation
     if (shouldTransform(newPath)) {
       const transformedKey = getTransformedKey(newPath);
       const processed = processTokenValue(value as Token, primitiveTokens, newPath);
       if (processed !== undefined) {
         result[transformedKey] = processed;
       }
-    } else if (typeof value === 'object' && value !== null) {
-      // Recursively process nested objects
-      processTransformableObject(value, newPath, result, primitiveTokens);
-    } else {
-      // Process non-transformable values
-      const processed = processTokenValue(value as Token | string | number | object | null | undefined, primitiveTokens, newPath);
+
+    } else if (typeof value === 'object' && value !== null && '$type' in value && '$value' in value) {
+      // Process ultimate token values to return only value instead of object with $type and $value, e.g. disabled.color
+      const processed = processTokenValue(tokenValue, primitiveTokens, newPath);
       if (processed !== undefined) {
-        let current = result;
-        for (let i = 0; i < currentPath.length; i++) {
-          if (!current[currentPath[i]]) {
-            current[currentPath[i]] = {};
-          }
-          current = current[currentPath[i]];
-        }
-        current[key] = processed;
+       result[tokenKey] = processed;
       }
+
+    } else if (typeof value === 'object' && value !== null) {
+      // Recursively process nested object tokens, e.g. muted.color in hover.muted.color
+      processTransformableToken(tokenKey, value, newPath, result, primitiveTokens);
+    } else {
+      throw new Error(`Could not process token properly: ${JSON.stringify(tokenValue)} at path ${currentPath.join('.')}`);
     }
   }
 }
@@ -491,37 +508,18 @@ function processTokenValue(
   primitiveTokens: any,
   currentPath: string[] = []
 ): any {
-  // If token is null or undefined, return undefined
   if (!token) return undefined;
 
-  // If it's a token object with $type and $value
+  // Process ultimate token values to return only value instead of object with $type and $value
   if (typeof token === 'object' && '$type' in token && '$value' in token) {
     const value = (token as Token).$value;
+    const type = (token as Token).$type;
     
-    switch ((token as Token).$type) {
+    switch (type) {
       case 'boxShadow':
         return processBoxShadow(value);
       default:
-        // For other types, just return the value
         return value;
-    }
-  }
-
-  // If it's a reference string (e.g. "{primary.500}")
-  if (typeof token === 'string' && token.includes('{')) {
-    return token; // Keep references as is
-  }
-
-  // If it's a color value that could be referenced from primitive tokens
-  if (typeof token === 'string' && token.startsWith('#')) {
-    for (const [category, colors] of Object.entries(primitiveTokens || {})) {
-      if (typeof colors === 'object' && colors !== null) {
-        for (const [shade, colorValue] of Object.entries(colors)) {
-          if (colorValue === token) {
-            return `{${category}.${shade}}`;
-          }
-        }
-      }
     }
   }
 
@@ -549,22 +547,20 @@ function processTokenValue(
           result.navigation = processedNavigation;
         }
       } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
-        // Process transformable object recursively
-        processTransformableObject(value, newPath, result, primitiveTokens);
+        // Transformable token, e.g. border.color to borderColor
+        processTransformableToken(key, value, newPath, result, primitiveTokens);
+
       } else if (!shouldTransform(newPath)) {
-        // Normal processing for non-transformable properties
         const processed = processTokenValue(value, primitiveTokens, newPath);
         if (processed !== undefined) {
           result[key] = processed;
         }
       }
     }
-    
     return result;
   }
 
-  // Return primitive values as is
-  return token;
+  throw new Error(`Could not process token properly: ${JSON.stringify(token)} at path ${currentPath.join('.')}`);
 }
 
 function processPrimitiveTokens(tokens: any): any {
@@ -624,14 +620,11 @@ function formatObject(obj: any, indent = 0): string {
 }
 
 try {
-  // Read tokens file
-  const tokensPath = path.join(__dirname, 'tokens/tokens.json');
+  const tokensPath = path.join(__dirname, 'tokens/tokens-customized.json');
   const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf-8'));
 
-  // Generate theme structure
   const theme = generateTheme(tokens);
 
-  // Generate theme file content
   const content = `import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
 
@@ -639,7 +632,6 @@ const Default = definePreset(Aura, ${formatObject(theme, 2)});
 
 export default Default;`;
 
-  // Write theme file
   const outputPath = path.join(__dirname, 'PrimeVueTest/assets/themes/default.ts');
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, content);
