@@ -95,7 +95,10 @@ interface ProcessedNavigation {
     padding?: string;
     fontWeight?: string;
   }
-  submenuIconSize?: {
+  submenuIcon?: {
+    color?: string;
+    focusColor?: string;
+    activeColor?: string;
     size?: string;
   }
 }
@@ -291,33 +294,50 @@ function processFormField(field: any): ProcessedFormField {
 function processList(field: any): ProcessedList {
   const result: ProcessedList = {};
 
-  if (field.padding?.$value !== undefined) {
-    result.padding = field.padding.$value;
+  const padding = field.padding?.$value || field.padding;
+  if (padding !== undefined) {
+    result.padding = padding;
   }
 
-  if (field.gap?.$value !== undefined) {
-    result.gap = field.gap.$value;
+  const gap = field.gap?.$value || field.gap;
+  if (gap !== undefined) {
+    result.gap = gap;
   }
 
-  if (field.header?.padding?.$value !== undefined) {
+  const headerPadding = field.header?.padding?.$value || field.header?.padding;
+  if (headerPadding !== undefined) {
     result.header = {
-      padding: field.header.padding.$value
+      padding: headerPadding
     };
   }
 
   if (field.option) {
     const optionProps = {
+      borderRadius: field.option.border?.radius?.$value,
+      focusBackground: field.option.focus?.background?.$value,
+      selectedBackground: field.option.selected?.background?.$value,
+      selectedFocusBackground: field.option.selected?.focus?.background?.$value,
+      color: field.option.color?.$value,
+      focusColor: field.option.focus?.color?.$value,
+      selectedColor: field.option.selected?.color?.$value,
+      selectedFocusColor: field.option.selected?.focus?.color?.$value,
       padding: field.option.padding?.$value,
-      borderRadius: field.option.border?.radius?.$value
+      icon: {
+        color: field.option.icon?.color?.$value,
+        focusColor: field.option.icon?.focus?.color?.$value
+      }
     };
-    if (Object.values(optionProps).some(v => v !== undefined)) {
+    if (Object.values(optionProps).some(v => v !== undefined) || 
+        (optionProps.icon && Object.values(optionProps.icon).some(v => v !== undefined))) {
       result.option = optionProps;
     }
 
     if (field.option.group) {
       const groupProps = {
-        padding: field.option.group.padding?.$value,
-        fontWeight: field.option.group.font?.weight?.$value
+        fontWeight: field.option.group.font?.weight?.$value,
+        background: field.option.group.background?.$value,
+        color: field.option.group.color?.$value,
+        padding: field.option.group.padding?.$value
       };
       if (Object.values(groupProps).some(v => v !== undefined)) {
         result.optionGroup = groupProps;
@@ -345,15 +365,27 @@ function processNavigation(field: any): ProcessedNavigation {
     const itemProps = {
       padding: field.item.padding?.$value,
       borderRadius: field.item.border?.radius?.$value,
-      gap: field.item.gap?.$value
+      gap: field.item.gap?.$value,
+      focusBackground: field.item.focus?.background?.$value,
+      activeBackground: field.item.active?.background?.$value,
+      color: field.item.color?.$value,
+      focusColor: field.item.focus?.color?.$value,
+      activeColor: field.item.active?.color?.$value,
+      icon: {
+        color: field.item.icon?.color?.$value,
+        focusColor: field.item.icon?.focus?.color?.$value
+      }
     };
-    if (Object.values(itemProps).some(v => v !== undefined)) {
+    if (Object.values(itemProps).some(v => v !== undefined) || 
+        (itemProps.icon && Object.values(itemProps.icon).some(v => v !== undefined))) {
       result.item = itemProps;
     }
   }
 
   if (field.submenu?.label) {
     const labelProps = {
+      background: field.submenu.label.background?.$value,
+      color: field.submenu.label.color?.$value,
       padding: field.submenu.label.padding?.$value,
       fontWeight: field.submenu.label.font?.weight?.$value
     };
@@ -362,10 +394,16 @@ function processNavigation(field: any): ProcessedNavigation {
     }
   }
 
-  if (field.submenu?.icon?.size?.$value !== undefined) {
-    result.submenuIconSize = {
-      size: field.submenu.icon.size.$value
+  if (field.submenu?.icon) {
+    const iconProps = {
+      color: field.submenu.icon.color?.$value,
+      focusColor: field.submenu.icon.focus?.color?.$value,
+      activeColor: field.submenu.icon.active?.color?.$value,
+      size: field.submenu.icon.size?.$value
     };
+    if (Object.values(iconProps).some(v => v !== undefined)) {
+      result.submenuIcon = iconProps;
+    }
   }
 
   return result;
@@ -383,13 +421,16 @@ const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
   'focus.color': 'focusColor',
   'focus.ring': 'focusRing',
   'form.field': 'formField',
+  'hover.background': 'hoverBackground',
   'hover.color': 'hoverColor',
+  'hover.muted.color': 'hoverMutedColor',
   'icon.size': 'iconSize',
-  'transition.duration': 'transitionDuration'
+  'muted.color': 'mutedColor',
+  'transition.duration': 'transitionDuration',
 };
 
 // Parent properties that might need transformation
-const TRANSFORM_PARENTS = new Set(['active', 'anchor', 'border', 'contrast', 'disabled', 'focus', 'form', 'hover', 'icon', 'transition']);
+const TRANSFORM_PARENTS = new Set(['active', 'anchor', 'border', 'contrast', 'disabled', 'focus', 'form', 'hover', 'icon', 'muted', 'transition']);
   
 function shouldTransform(path: string[]): boolean {
   const pathStr = path.join('.');
@@ -497,12 +538,12 @@ function processTokenValue(
         if (processedField) {
           result.formField = processedField;
         }
-      } else if (pathStr === 'semantic.list') {
+      } else if (pathStr === 'semantic.list' || pathStr === 'semantic.light.list' || pathStr === 'semantic.dark.list') {
         const processedList = processList(value);
         if (processedList) {
           result.list = processedList;
         }
-      } else if (pathStr === 'semantic.navigation') {
+      } else if (pathStr === 'semantic.navigation' || pathStr === 'semantic.light.navigation' || pathStr === 'semantic.dark.navigation') {
         const processedNavigation = processNavigation(value);
         if (processedNavigation) {
           result.navigation = processedNavigation;
