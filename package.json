@@ -2,9 +2,9 @@
   "name": "primevue-theme-generator",
   "version": "1.0.0",
   "description": "Theme generator for PrimeVue components",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
-    "theme": "ts-node index.ts"
+    "theme": "ts-node src/index.ts"
   },
   "keywords": ["primevue", "theme", "generator"],
   "author": "",
