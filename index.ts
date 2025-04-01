@@ -5,7 +5,7 @@ import { generateTheme, formatObject } from './theme';
 import { validateTokenStructure } from './validation';
 
 try {
-  const tokensPath = path.join(__dirname, 'tokens/tokens-customized.json');
+  const tokensPath = path.join(__dirname, 'tokens/tokens.json');
   
   if (!fs.existsSync(tokensPath)) {
     throw new Error(`Tokens file not found at: ${tokensPath}`);

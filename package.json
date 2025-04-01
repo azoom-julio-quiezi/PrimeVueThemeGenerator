@@ -1,12 +1,12 @@
 {
-  "name": "style-dictionary",
+  "name": "primevue-theme-generator",
   "version": "1.0.0",
-  "description": "",
+  "description": "Theme generator for PrimeVue components",
   "main": "index.ts",
   "scripts": {
     "theme": "ts-node index.ts"
   },
-  "keywords": [],
+  "keywords": ["primevue", "theme", "generator"],
   "author": "",
   "license": "ISC",
   "devDependencies": {
