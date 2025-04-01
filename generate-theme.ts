@@ -74,7 +74,6 @@ function processFormField(field: TokenNode): ProcessedToken {
         paddingY: sizeValue?.padding?.y?.$value
       };
     } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
-      // Transformable token, e.g. border.color to borderColor
       processTransformableToken(key, (value as unknown) as TokenValue, [key], result, {});
     } else {
       const processed = processTokenValue(value, {}, []);
@@ -255,65 +254,125 @@ function processTransformableToken(
   result: ProcessedToken,
   primitiveTokens: TokenNode
 ): void {
-  if (!tokenValue || typeof tokenValue !== 'object') return;
+  try {
+    if (!tokenValue || typeof tokenValue !== 'object') return;
 
-  // Initialize the result object for this token key if it doesn't exist
-  if (!result[tokenKey]) {
-    result[tokenKey] = {};
+    // Initialize the result object for this token key if it doesn't exist
+    if (!result[tokenKey]) {
+      result[tokenKey] = {};
+    }
+
+    for (const [key, value] of Object.entries(tokenValue)) {
+      try {
+        const newPath = [...currentPath, key];
+        if (shouldTransform(newPath)) {
+          const transformedKey = getTransformedKey(newPath);
+          
+          // Validate value before processing
+          if (typeof value === 'object' && value !== null && '$type' in value && '$value' in value) {
+            const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
+            if (processed !== undefined) {
+              const currentKeyIndex = newPath.indexOf(key);
+              const parentKey = newPath[currentKeyIndex - 1];
+              const pathStr = newPath.join('.');
+              const matchingPattern = Object.keys(TOKEN_TRANSFORMATIONS).find(pattern => pathStr.endsWith(pattern));
+              
+              try {
+                if (matchingPattern && matchingPattern.split('.').length >= 3) {
+                  // If the matching pattern has 3 or more segments, store directly under transformed key
+                  result[transformedKey] = processed;
+                } else if (parentKey === tokenKey) {
+                  // If the parent key is the same as the token key, store directly under transformed key
+                  result[transformedKey] = processed;
+                } else if (newPath.includes(tokenKey)) {
+                  // If the token key is anywhere in the path, store under token key's object
+                  const tokenKeyObj = result[tokenKey] as ProcessedToken;
+                  tokenKeyObj[transformedKey] = processed;
+                } else {
+                  // If no transformation pattern matches and token key is not in path, store under token key's object
+                  const tokenKeyObj = result[tokenKey] as ProcessedToken;
+                  tokenKeyObj[transformedKey] = processed;
+                }
+              } catch (error) {
+                console.warn(`Warning: Failed to store processed token at path ${newPath.join('.')}:`, error);
+              }
+            }
+          } else {
+            console.warn(`Warning: Invalid token value at path ${newPath.join('.')}:`, value);
+          }
+        } else if (typeof value === 'object' && value !== null) {
+          if ('$type' in value && '$value' in value) {
+            // Handle grandchild token values if it doesn't match transformable token
+            const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
+            if (processed !== undefined) {
+              try {
+                const tokenKeyObj = result[tokenKey] as ProcessedToken;
+                tokenKeyObj[key] = processed;
+              } catch (error) {
+                console.warn(`Warning: Failed to store processed token at path ${newPath.join('.')}:`, error);
+              }
+            }
+          } else if (typeof tokenValue === 'object' && '$type' in tokenValue && '$value' in tokenValue) {
+            // Handle child token values if it doesn't match transformable token
+            const processed = processTokenValue(tokenValue as TokenLeaf, primitiveTokens, newPath);
+            if (processed !== undefined) {
+              try {
+                result[tokenKey] = processed;
+              } catch (error) {
+                console.warn(`Warning: Failed to store processed token at path ${newPath.join('.')}:`, error);
+              }
+            }
+          } else {
+            // Process nested objects recursively
+            processTransformableToken(tokenKey, value, newPath, result, primitiveTokens);
+          }
+        } else {
+          console.warn(`Warning: Could not process token at path ${newPath.join('.')}:`, value);
+        }
+      } catch (error) {
+        console.warn(`Warning: Failed to process token at path ${[...currentPath, key].join('.')}:`, error);
+      }
+    }
+
+    // Remove empty objects from result
+    if (result[tokenKey] && Object.keys(result[tokenKey]).length === 0) {
+      delete result[tokenKey];
+    }
+  } catch (error) {
+    console.warn(`Warning: Error in processTransformableToken at path ${currentPath.join('.')}:`, error);
+  }
+}
+
+function validateTokenStructure(token: any): boolean {
+  if (!token || typeof token !== 'object') {
+    console.warn('Invalid token: not an object or null/undefined');
+    return false;
   }
 
-  for (const [key, value] of Object.entries(tokenValue)) {
-    const newPath = [...currentPath, key];
-    if (shouldTransform(newPath)) {
-      const transformedKey = getTransformedKey(newPath);
-      const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
-      if (processed !== undefined) {
-        const currentKeyIndex = newPath.indexOf(key);
-        const parentKey = newPath[currentKeyIndex - 1];
-        const pathStr = newPath.join('.');
-        const matchingPattern = Object.keys(TOKEN_TRANSFORMATIONS).find(pattern => pathStr.endsWith(pattern));
-        
-        if (matchingPattern && matchingPattern.split('.').length >= 3) {
-          // If the matching pattern has 3 or more segments, store directly under transformed key
-          result[transformedKey] = processed;
-        } else if (parentKey === tokenKey) {
-          // If the parent key is the same as the token key, store directly under transformed key
-          result[transformedKey] = processed;
-        } else if (newPath.includes(tokenKey)) {
-          // If the token key is anywhere in the path, store under token key's object
-          const tokenKeyObj = result[tokenKey] as ProcessedToken;
-          tokenKeyObj[transformedKey] = processed;
-        } else {
-          // If no transformation pattern matches and token key is not in path, store under token key's object
-          const tokenKeyObj = result[tokenKey] as ProcessedToken;
-          tokenKeyObj[transformedKey] = processed;
-        }
-      }
-    } else if (typeof value === 'object' && value !== null && '$type' in value && '$value' in value) {
-      // Handle grandchild token values if it doesn't match transformable token
-      const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
-      if (processed !== undefined) {
-        const tokenKeyObj = result[tokenKey] as ProcessedToken;
-        tokenKeyObj[key] = processed;
-      }
-    } else if (typeof tokenValue === 'object' && value !== null && '$type' in tokenValue && '$value' in tokenValue) {
-      // Handle child token values if it doesn't match transformable token
-      const processed = processTokenValue(tokenValue as TokenLeaf, primitiveTokens, newPath);
-      if (processed !== undefined) {
-        result[tokenKey] = processed;
-      }
-    } else if (typeof value === 'object' && value !== null) {
-      // Process nested objects recursively
-      processTransformableToken(tokenKey, value, newPath, result, primitiveTokens);
-    } else {
-      throw new Error(`Could not process token properly: ${JSON.stringify(tokenValue)} at path ${currentPath.join('.')}`);
+  // Skip validation for special keys that don't follow the token structure
+  if ('$themes' in token) {
+    return true;
+  }
+
+  // Check if it's a leaf node (has $type and $value)
+  if ('$type' in token && '$value' in token) {
+    return true;
+  }
+
+  // For non-leaf nodes, validate all children
+  for (const [key, value] of Object.entries(token)) {
+    // Skip numeric keys (array indices)
+    if (/^\d+$/.test(key)) {
+      continue;
+    }
+    
+    if (!validateTokenStructure(value)) {
+      console.warn(`Invalid token structure at key: ${key}`);
+      return false;
     }
   }
 
-  // Remove empty objects from result
-  if (result[tokenKey] && Object.keys(result[tokenKey]).length === 0) {
-    delete result[tokenKey];
-  }
+  return true;
 }
 
 function processTokenValue(
@@ -321,58 +380,67 @@ function processTokenValue(
   primitiveTokens: TokenNode,
   currentPath: string[] = []
 ): TokenValue | ProcessedToken | undefined {
-  if (!token) return undefined;
+  try {
+    if (!token) return undefined;
 
-  // Process ultimate token values to return only value instead of object with $type and $value
-  if (typeof token === 'object' && '$type' in token && '$value' in token) {
-    const value = (token as TokenLeaf).$value;
-    const type = (token as TokenLeaf).$type;
-    
-    switch (type) {
-      case 'boxShadow':
-        return processBoxShadow(value as ShadowValue | ShadowValue[]);
-      default:
-        return value;
-    }
-  }
-
-  // For objects, process each property recursively
-  if (typeof token === 'object') {
-    const result: ProcessedToken = {};
-    
-    for (const [key, value] of Object.entries(token)) {
-      const newPath = [...currentPath, key];
-      const pathStr = newPath.join('.');
-
-      if (pathStr === 'semantic.form' || pathStr === 'semantic.light.form' || pathStr === 'semantic.dark.form') {
-        const processedField = processFormField(value.field);
-        if (processedField) {
-          result.formField = processedField;
-        }
-      } else if (pathStr === 'semantic.list' || pathStr === 'semantic.light.list' || pathStr === 'semantic.dark.list') {
-        const processedList = processList(value);
-        if (processedList) {
-          result.list = processedList;
-        }
-      } else if (pathStr === 'semantic.navigation' || pathStr === 'semantic.light.navigation' || pathStr === 'semantic.dark.navigation') {
-        const processedNavigation = processNavigation(value);
-        if (processedNavigation) {
-          result.navigation = processedNavigation;
-        }
-      } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
-        // Transformable token, e.g. border.color to borderColor
-        processTransformableToken(key, value, newPath, result, primitiveTokens);
-      } else {
-        const processed = processTokenValue(value, primitiveTokens, newPath);
-        if (processed !== undefined) {
-          result[key] = processed;
-        }
+    // Process ultimate token values to return only value instead of object with $type and $value
+    if (typeof token === 'object' && '$type' in token && '$value' in token) {
+      const value = (token as TokenLeaf).$value;
+      const type = (token as TokenLeaf).$type;
+      
+      switch (type) {
+        case 'boxShadow':
+          return processBoxShadow(value as ShadowValue | ShadowValue[]);
+        default:
+          return value;
       }
     }
-    return result;
-  }
 
-  throw new Error(`Could not process token properly: ${JSON.stringify(token)} at path ${currentPath.join('.')}`);
+    // For objects, process each property recursively
+    if (typeof token === 'object') {
+      const result: ProcessedToken = {};
+      
+      for (const [key, value] of Object.entries(token)) {
+        try {
+          const newPath = [...currentPath, key];
+          const pathStr = newPath.join('.');
+
+          if (pathStr === 'semantic.form' || pathStr === 'semantic.light.form' || pathStr === 'semantic.dark.form') {
+            const processedField = processFormField(value.field);
+            if (processedField) {
+              result.formField = processedField;
+            }
+          } else if (pathStr === 'semantic.list' || pathStr === 'semantic.light.list' || pathStr === 'semantic.dark.list') {
+            const processedList = processList(value);
+            if (processedList) {
+              result.list = processedList;
+            }
+          } else if (pathStr === 'semantic.navigation' || pathStr === 'semantic.light.navigation' || pathStr === 'semantic.dark.navigation') {
+            const processedNavigation = processNavigation(value);
+            if (processedNavigation) {
+              result.navigation = processedNavigation;
+            }
+          } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
+            processTransformableToken(key, (value as unknown) as TokenValue, newPath, result, primitiveTokens);
+          } else {
+            const processed = processTokenValue(value, primitiveTokens, newPath);
+            if (processed !== undefined) {
+              result[key] = processed;
+            }
+          }
+        } catch (error) {
+          console.warn(`Warning: Failed to process token at path ${[...currentPath, key].join('.')}:`, error);
+        }
+      }
+      return result;
+    }
+
+    console.warn(`Warning: Unexpected token type at path ${currentPath.join('.')}:`, token);
+    return undefined;
+  } catch (error) {
+    console.warn(`Warning: Error processing token at path ${currentPath.join('.')}:`, error);
+    return undefined;
+  }
 }
 
 function processPrimitiveTokens(tokens: TokenNode): ProcessedToken {
@@ -433,7 +501,24 @@ function formatObject(obj: TokenSet, indent = 0): string {
 
 try {
   const tokensPath = path.join(__dirname, 'tokens/tokens-customized.json');
-  const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf-8'));
+  
+  if (!fs.existsSync(tokensPath)) {
+    throw new Error(`Tokens file not found at: ${tokensPath}`);
+  }
+
+  const fileContent = fs.readFileSync(tokensPath, 'utf-8');
+  let tokens;
+  
+  try {
+    tokens = JSON.parse(fileContent);
+  } catch (error) {
+    throw new Error(`Invalid JSON in tokens file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
+  // Validate token structure
+  if (!validateTokenStructure(tokens)) {
+    throw new Error('Invalid token structure in tokens file');
+  }
 
   const theme = generateTheme(tokens);
 
@@ -442,13 +527,18 @@ import Aura from '@primeuix/themes/aura'
 
 const Default = definePreset(Aura, ${formatObject(theme, 2)});
 
-export default Default;`;
+export default {
+  preset: Default,
+}`;
 
   const outputPath = path.join(__dirname, 'PrimeVueTest/assets/themes/default.ts');
+  
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  
   fs.writeFileSync(outputPath, content);
   
   console.log('Theme file generated successfully!');
 } catch (error) {
   console.error('Error generating theme:', error);
+  process.exit(1);
 } 
