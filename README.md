@@ -10,6 +10,25 @@ A tool to generate PrimeVue theme files from design tokens. This generator proce
 - Handles complex token transformations
 - Type-safe implementation with TypeScript
 
+## Project Structure
+
+```
+.
+├── src/                    # Source code
+│   ├── index.ts           # Main entry point
+│   ├── types.ts           # TypeScript type definitions
+│   ├── transformations.ts # Token transformation rules
+│   ├── processors.ts      # Token processing logic
+│   ├── theme.ts           # Theme generation logic
+│   └── validation.ts      # Token validation
+├── tokens/                # Design token files
+│   └── tokens.json       # Main tokens file
+├── assets/               # Generated theme files
+│   └── themes/          # Theme output directory
+├── package.json         # Project configuration
+└── tsconfig.json       # TypeScript configuration
+```
+
 ## Usage
 
 1. Install dependencies:
@@ -22,17 +41,7 @@ npm install
 npm run theme
 ```
 
-This will process the tokens from `tokens/tokens.json` and generate the theme file in `PrimeVueTest/assets/themes/default.ts`.
-
-## Project Structure
-
-- `index.ts` - Main entry point
-- `types.ts` - TypeScript type definitions
-- `transformations.ts` - Token transformation rules
-- `processors.ts` - Token processing logic
-- `theme.ts` - Theme generation logic
-- `validation.ts` - Token validation
-- `tokens/` - Design token files
+This will process the tokens from `tokens/tokens.json` and generate the theme file in `assets/themes/default.ts`.
 
 ## Development
 
