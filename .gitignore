@@ -32,4 +32,7 @@ yarn-error.log*
 *.sw?
 
 # Tokens specific
-.tokens/ 
+.tokens/
+
+# Generated files
+assets/
