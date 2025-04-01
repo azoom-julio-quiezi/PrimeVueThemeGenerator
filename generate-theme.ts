@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-type TokenValue = string | object;
+type TokenValue = string | ShadowValue;
 
 interface ProcessedToken {
-  [key: string]: TokenValue;
+  [key: string]: TokenValue | ProcessedToken;
 }
 
 interface TokenLeaf {
@@ -17,10 +17,10 @@ type TokenNode = {
 };
 
 interface TokenSet {
-  primitive?: TokenNode;
-  semantic?: TokenNode;
-  light?: TokenNode;
-  dark?: TokenNode;
+  primitive?: ProcessedToken;
+  semantic?: ProcessedToken;
+  light?: ProcessedToken;
+  dark?: ProcessedToken;
 }
 
 interface ShadowValue {
@@ -52,7 +52,10 @@ function processFormField(field: TokenNode): ProcessedToken {
     if (value === undefined) continue;
 
     if (key === 'padding') {
-      const paddingValue = value as TokenNode;
+      const paddingValue = value as {
+        x: TokenLeaf;
+        y: TokenLeaf;
+      };
       result.paddingX = paddingValue?.x?.$value;
       result.paddingY = paddingValue?.y?.$value;
     } else if (key === 'sm' || key === 'lg') {
@@ -72,7 +75,7 @@ function processFormField(field: TokenNode): ProcessedToken {
       };
     } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
       // Transformable token, e.g. border.color to borderColor
-      processTransformableToken(key, value, [key], result, {});
+      processTransformableToken(key, (value as unknown) as TokenValue, [key], result, {});
     } else {
       const processed = processTokenValue(value, {}, []);
       if (processed !== undefined) {
@@ -93,26 +96,30 @@ function processList(field: TokenNode): ProcessedToken {
     if (value === undefined) continue;
 
     if (key === 'option') {
-      const { group, icon, ...optionWithoutGroup } = value as any;
+      const { group, icon, ...optionWithoutGroup } = value as TokenNode;
       const optionProcessed = processTokenValue(optionWithoutGroup, {}, []);
-
-      if (icon) {
-        const iconValue = icon as {
-          color: TokenLeaf;
-          focus: {
-            color: TokenLeaf;
-          };
-        };
-        optionProcessed.icon = {
-          color: iconValue.color.$value,
-          focusColor: iconValue.focus.color.$value
-        };
-      }
       
-      result.option = optionProcessed;
+      if (optionProcessed) {
+        if (icon) {
+          const iconValue = icon as {
+            color: TokenLeaf;
+            focus: {
+              color: TokenLeaf;
+            };
+          };
+          (optionProcessed as ProcessedToken).icon = {
+            color: iconValue.color.$value,
+            focusColor: iconValue.focus.color.$value
+          };
+        }
+        
+        result.option = optionProcessed;
+      }
 
       const groupProcessed = processTokenValue(group, {}, []);
-      result.optionGroup = groupProcessed;
+      if (groupProcessed) {
+        result.optionGroup = groupProcessed;
+      }
     } else {
       const processed = processTokenValue(value, {}, []);
       if (processed !== undefined) {
@@ -133,34 +140,40 @@ function processNavigation(field: TokenNode): ProcessedToken {
     if (value === undefined) continue;
 
     if (key === 'submenu') {
-      const { label, icon } = value as any;
+      const { label, icon } = value as TokenNode;
       const labelProcessed = processTokenValue(label, {}, []);
-      result.submenuLabel = labelProcessed;
+      if (labelProcessed) {
+        result.submenuLabel = labelProcessed;
+      }
 
       const iconProcessed = processTokenValue(icon, {}, []);
-      result.submenuIcon = iconProcessed;
+      if (iconProcessed) {
+        result.submenuIcon = iconProcessed;
+      }
     } else if (key === 'item') {
-      const { icon, ...itemWithoutIcon } = value as any;
+      const { icon, ...itemWithoutIcon } = value as TokenNode;
       const itemProcessed = processTokenValue(itemWithoutIcon, {}, []);
       
-      if (icon) {
-        const iconValue = icon as {
-          color: TokenLeaf;
-          focus: {
+      if (itemProcessed) {
+        if (icon) {
+          const iconValue = icon as {
             color: TokenLeaf;
+            focus: {
+              color: TokenLeaf;
+            };
+            active: {
+              color: TokenLeaf;
+            };
           };
-          active: {
-            color: TokenLeaf;
+          (itemProcessed as ProcessedToken).icon = {
+            color: iconValue.color.$value,
+            focusColor: iconValue.focus.color.$value,
+            activeColor: iconValue.active.color.$value
           };
-        };
-        itemProcessed.icon = {
-          color: iconValue.color.$value,
-          focusColor: iconValue.focus.color.$value,
-          activeColor: iconValue.active.color.$value
-        };
+        }
+        
+        result.item = itemProcessed;
       }
-      
-      result.item = itemProcessed;
     } else {
       const processed = processTokenValue(value, {}, []);
       if (processed !== undefined) {
@@ -237,10 +250,10 @@ function getTransformedKey(path: string[]): string {
 
 function processTransformableToken(
   tokenKey: string,
-  tokenValue: any,
+  tokenValue: TokenValue,
   currentPath: string[],
-  result: any,
-  primitiveTokens: any
+  result: ProcessedToken,
+  primitiveTokens: TokenNode
 ): void {
   if (!tokenValue || typeof tokenValue !== 'object') return;
 
@@ -268,17 +281,20 @@ function processTransformableToken(
           result[transformedKey] = processed;
         } else if (newPath.includes(tokenKey)) {
           // If the token key is anywhere in the path, store under token key's object
-          result[tokenKey][transformedKey] = processed;
+          const tokenKeyObj = result[tokenKey] as ProcessedToken;
+          tokenKeyObj[transformedKey] = processed;
         } else {
           // If no transformation pattern matches and token key is not in path, store under token key's object
-          result[tokenKey][transformedKey] = processed;
+          const tokenKeyObj = result[tokenKey] as ProcessedToken;
+          tokenKeyObj[transformedKey] = processed;
         }
       }
     } else if (typeof value === 'object' && value !== null && '$type' in value && '$value' in value) {
       // Handle grandchild token values if it doesn't match transformable token
       const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
       if (processed !== undefined) {
-        result[tokenKey][key] = processed;
+        const tokenKeyObj = result[tokenKey] as ProcessedToken;
+        tokenKeyObj[key] = processed;
       }
     } else if (typeof tokenValue === 'object' && value !== null && '$type' in tokenValue && '$value' in tokenValue) {
       // Handle child token values if it doesn't match transformable token
@@ -301,10 +317,10 @@ function processTransformableToken(
 }
 
 function processTokenValue(
-  token: TokenLeaf | string | object | null | undefined, 
-  primitiveTokens: any,
+  token: TokenNode | TokenLeaf | TokenValue, 
+  primitiveTokens: TokenNode,
   currentPath: string[] = []
-): any {
+): TokenValue | ProcessedToken | undefined {
   if (!token) return undefined;
 
   // Process ultimate token values to return only value instead of object with $type and $value
@@ -322,7 +338,7 @@ function processTokenValue(
 
   // For objects, process each property recursively
   if (typeof token === 'object') {
-    const result: any = {};
+    const result: ProcessedToken = {};
     
     for (const [key, value] of Object.entries(token)) {
       const newPath = [...currentPath, key];
@@ -359,30 +375,30 @@ function processTokenValue(
   throw new Error(`Could not process token properly: ${JSON.stringify(token)} at path ${currentPath.join('.')}`);
 }
 
-function processPrimitiveTokens(tokens: any): any {
+function processPrimitiveTokens(tokens: TokenNode): ProcessedToken {
   const primitiveTokens = tokens['aura/primitive'];
-  return primitiveTokens ? processTokenValue(primitiveTokens, primitiveTokens, ['primitive']) : {};
+  const processed = primitiveTokens && !('$type' in primitiveTokens) ? processTokenValue(primitiveTokens, primitiveTokens as TokenNode, ['primitive']) : {};
+  return processed as ProcessedToken;
 }
 
-function processSemanticTokens(tokens: any, primitiveTokens: any): any {
+function processSemanticTokens(tokens: TokenNode, primitiveTokens: ProcessedToken): ProcessedToken {
   const semanticTokens = tokens['aura/semantic'];
-  return semanticTokens ? processTokenValue(semanticTokens, primitiveTokens, ['semantic']) : {};
+  const processed = semanticTokens ? processTokenValue(semanticTokens, primitiveTokens as TokenNode, ['semantic']) : {};
+  return processed as ProcessedToken;
 }
 
-function processColorScheme(tokens: any, primitiveTokens: any): { light: any; dark: any } {
+function processColorScheme(tokens: TokenNode, primitiveTokens: ProcessedToken): { light: ProcessedToken; dark: ProcessedToken } {
   return {
-    light: processTokenValue(tokens['aura/semantic/light'], primitiveTokens, ['semantic', 'light']),
-    dark: processTokenValue(tokens['aura/semantic/dark'], primitiveTokens, ['semantic', 'dark'])
+    light: processTokenValue(tokens['aura/semantic/light'], primitiveTokens as TokenNode, ['semantic', 'light']) as ProcessedToken,
+    dark: processTokenValue(tokens['aura/semantic/dark'], primitiveTokens as TokenNode, ['semantic', 'dark']) as ProcessedToken
   };
 }
 
-function generateTheme(tokens: any): TokenSet {
-  // Process each section separately
+function generateTheme(tokens: TokenNode): TokenSet {
   const primitive = processPrimitiveTokens(tokens);
   const semantic = processSemanticTokens(tokens, primitive);
   const { light, dark } = processColorScheme(tokens, primitive);
 
-  // Combine into final theme structure
   return {
     primitive,
     semantic: {
@@ -395,7 +411,7 @@ function generateTheme(tokens: any): TokenSet {
   };
 }
 
-function formatObject(obj: any, indent = 0): string {
+function formatObject(obj: TokenSet, indent = 0): string {
   if (!obj || Object.keys(obj).length === 0) return '{}';
 
   const spaces = ' '.repeat(indent);
