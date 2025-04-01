@@ -76,73 +76,6 @@ function processFormField(field: TokenNode): ProcessedToken {
       const paddingValue = value as TokenNode;
       result.paddingX = paddingValue?.x?.$value;
       result.paddingY = paddingValue?.y?.$value;
-    } else if (key === 'border') {
-      const borderValue = value as TokenNode;
-      result.borderRadius = borderValue?.radius?.$value;
-    } else if (key === 'transition') {
-      const transitionValue = value as TokenNode;
-      result.transitionDuration = transitionValue.duration.$value as string;
-    } else if (key === 'disabled') {
-      const disabledValue = value as TokenNode;
-      result.disabledColor = disabledValue.color.$value;
-      result.disabledBackground = disabledValue.background.$value;
-    } else if (key === 'icon') {
-      const iconValue = value as TokenNode;
-      result.iconColor = iconValue.color.$value;
-    } else if (key === 'hover') {
-      const hoverValue = value as {
-        border: {
-          color: TokenLeaf;
-        };
-      };
-      result.hoverBorderColor = hoverValue.border.color.$value;
-    } else if (key === 'invalid') {
-      const invalidValue = value as {
-        border: {
-          color: TokenLeaf;
-        };
-        placeholder: {
-          color: TokenLeaf;
-        };
-      };
-      result.invalidBorderColor = invalidValue.border.color.$value;
-      result.invalidPlaceholderColor = invalidValue.placeholder.color.$value;
-    } else if (key === 'filled') {
-      const filledValue = value as {
-        background: TokenLeaf;
-        focus: {
-          background: TokenLeaf;
-        };
-        hover: {
-          background: TokenLeaf;
-        };
-      };
-      result.filledBackground = filledValue.background.$value;
-      result.filledFocusBackground = filledValue.focus.background.$value;
-      result.filledHoverBackground = filledValue.hover.background.$value;
-    } else if (key === 'float') {
-      const floatValue = value as {
-        label: {
-          color: TokenLeaf;
-          focus: {
-            color: TokenLeaf;
-          };
-          invalid: {
-            color: TokenLeaf;
-          };
-          active: {
-            color: TokenLeaf;
-          };
-        };
-      };
-      result.floatLabelColor = floatValue.label.color.$value;
-      result.floatLabelFocusColor = floatValue.label.focus.color.$value;
-      result.floatLabelInvalidColor = floatValue.label.invalid.color.$value;
-      result.floatLabelActiveColor = floatValue.label.active.color.$value;
-    } else if (key === 'focus') {
-        const { ring } = value as any;
-        const ringProcessed = processTokenValue(ring, {}, []);
-        result.focusRing = ringProcessed;
     } else if (key === 'sm' || key === 'lg') {
       const sizeValue = value as {
         font: {
@@ -158,6 +91,9 @@ function processFormField(field: TokenNode): ProcessedToken {
         paddingX: sizeValue?.padding?.x?.$value,
         paddingY: sizeValue?.padding?.y?.$value
       };
+    } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
+      // Transformable token, e.g. border.color to borderColor
+      processTransformableToken(key, value, [key], result, {});
     } else {
       const processed = processTokenValue(value, {}, []);
       if (processed !== undefined) {
@@ -178,23 +114,8 @@ function processList(field: TokenNode): ProcessedToken {
     if (value === undefined) continue;
 
     if (key === 'option') {
-      const { group, selected, icon, ...optionWithoutGroup } = value as any;
+      const { group, icon, ...optionWithoutGroup } = value as any;
       const optionProcessed = processTokenValue(optionWithoutGroup, {}, []);
-      
-      if (selected) {
-        const selectedValue = selected as {
-          background: TokenLeaf;
-          focus: {
-            background: TokenLeaf;
-            color: TokenLeaf;
-          };
-          color: TokenLeaf;
-        };
-        optionProcessed.selectedBackground = selectedValue.background.$value;
-        optionProcessed.selectedColor = selectedValue.color.$value;
-        optionProcessed.selectedFocusBackground = selectedValue.focus.background.$value;
-        optionProcessed.selectedFocusColor = selectedValue.focus.color.$value;
-      }
 
       if (icon) {
         const iconValue = icon as {
@@ -211,7 +132,6 @@ function processList(field: TokenNode): ProcessedToken {
       
       result.option = optionProcessed;
 
-      // Process optionGroup properties
       const groupProcessed = processTokenValue(group, {}, []);
       result.optionGroup = groupProcessed;
     } else {
@@ -285,6 +205,8 @@ const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
   'focus.border.color': 'focusBorderColor',
   'invalid.border.color': 'invalidBorderColor',
   'invalid.placeholder.color': 'invalidPlaceholderColor',
+  'selected.focus.background': 'selectedFocusBackground',
+  'selected.focus.color': 'selectedFocusColor',
   'active.background': 'activeBackground',
   'active.color': 'activeColor',
   'anchor.gutter': 'anchorGutter',
@@ -310,8 +232,6 @@ const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
   'option.group': 'optionGroup',
   'placeholder.color': 'placeholderColor',
   'selected.background': 'selectedBackground',
-  'selected.focus.background': 'selectedFocusBackground',
-  'selected.focus.color': 'selectedFocusColor',
   'selected.color': 'selectedColor',
   'submenu.icon': 'submenuIcon',
   'submenu.label': 'submenuLabel',
