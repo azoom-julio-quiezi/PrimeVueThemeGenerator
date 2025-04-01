@@ -32,34 +32,13 @@ interface ShadowValue {
   type: 'dropShadow';
 }
 
-function isShadowValue(value: any): value is ShadowValue {
-  return (
-    value &&
-    typeof value === 'object' &&
-    'x' in value &&
-    'y' in value &&
-    'blur' in value &&
-    'spread' in value &&
-    'color' in value &&
-    'type' in value &&
-    value.type === 'dropShadow'
-  );
-}
-
-function processBoxShadow(value: any): string | undefined {
+function processBoxShadow(value: ShadowValue | ShadowValue[]): string | undefined {
   if (Array.isArray(value)) {
     return value
-      .filter(isShadowValue)
       .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
       .join(', ');
-  } else if (typeof value === 'object' && value !== null) {
-    if (isShadowValue(value)) {
-      return `${value.x} ${value.y} ${value.blur} ${value.spread} ${value.color}`;
-    }
-    return Object.values(value)
-      .filter(isShadowValue)
-      .map(shadow => `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`)
-      .join(', ');
+  } else if (value !== null) {
+    return `${value.x} ${value.y} ${value.blur} ${value.spread} ${value.color}`;
   }
   return undefined;
 }
@@ -335,14 +314,14 @@ function processTokenValue(
     
     switch (type) {
       case 'boxShadow':
-        return processBoxShadow(value);
+        return processBoxShadow(value as ShadowValue | ShadowValue[]);
       default:
         return value;
     }
   }
 
   // For objects, process each property recursively
-  if (typeof token === 'object' && !Array.isArray(token)) {
+  if (typeof token === 'object') {
     const result: any = {};
     
     for (const [key, value] of Object.entries(token)) {
