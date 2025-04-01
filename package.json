@@ -2,21 +2,16 @@
   "name": "style-dictionary",
   "version": "1.0.0",
   "description": "",
-  "main": "build.js",
-  "type": "commonjs",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node build.js"
+    "theme": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "style-dictionary": "^3.9.2"
-  },
   "devDependencies": {
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.11.24",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.3.3"
   }
 }

@@ -31,6 +31,5 @@ yarn-error.log*
 *.sln
 *.sw?
 
-# Style Dictionary specific
-build/
+# Tokens specific
 .tokens/ 
