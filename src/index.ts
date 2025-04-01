@@ -5,7 +5,7 @@ import { generateTheme, formatObject } from './theme';
 import { validateTokenStructure } from './validation';
 
 try {
-  const tokensPath = path.join(__dirname, 'tokens/tokens.json');
+  const tokensPath = path.join(__dirname, '../tokens/tokens.json');
   
   if (!fs.existsSync(tokensPath)) {
     throw new Error(`Tokens file not found at: ${tokensPath}`);
@@ -36,7 +36,7 @@ export default {
   preset: Default,
 }`;
 
-  const outputPath = path.join(__dirname, 'PrimeVueTest/assets/themes/default.ts');
+  const outputPath = path.join(__dirname, '../assets/themes/default.ts');
   
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   
