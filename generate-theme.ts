@@ -1,17 +1,26 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-interface Token {
-  $type?: string;
-  $value?: string | number | object;
-  [key: string]: any;
+type TokenValue = string | object;
+
+interface ProcessedToken {
+  [key: string]: TokenValue;
 }
 
+interface TokenLeaf {
+  $type: string;
+  $value: TokenValue;
+}
+
+type TokenNode = {
+  [key: string]: TokenLeaf | TokenNode;
+};
+
 interface TokenSet {
-  primitive?: any;
-  semantic?: any;
-  light?: any;
-  dark?: any;
+  primitive?: TokenNode;
+  semantic?: TokenNode;
+  light?: TokenNode;
+  dark?: TokenNode;
 }
 
 interface ShadowValue {
@@ -21,90 +30,6 @@ interface ShadowValue {
   spread?: string;
   color?: string;
   type: 'dropShadow';
-}
-interface ProcessedFormField {
-  background?: string;
-  borderColor?: string;
-  borderRadius?: string;
-  color?: string;
-  disabledBackground?: string;
-  disabledColor?: string;
-  filledBackground?: string;
-  filledFocusBackground?: string;
-  filledHoverBackground?: string;
-  floatLabelColor?: string;
-  floatLabelFocusColor?: string;
-  floatLabelInvalidColor?: string;
-  focusBorderColor?: string;
-  focusRing?: {
-    color?: string;
-    offset?: string;
-    shadow?: string;
-    style?: string;
-    width?: string;
-  };
-  fontSize?: string;
-  hoverBorderColor?: string;
-  iconColor?: string;
-  invalidBorderColor?: string;
-  invalidPlaceholderColor?: string;
-  lg?: {
-    fontSize?: string;
-    paddingX?: string;
-    paddingY?: string;
-  };
-  paddingX?: string;
-  paddingY?: string;
-  placeholderColor?: string;
-  shadow?: string;
-  sm?: {
-    fontSize?: string;
-    paddingX?: string;
-    paddingY?: string;
-  };
-  transitionDuration?: string;
-}
-
-interface ProcessedList {
-  padding?: string;
-  gap?: string;
-  header?: {
-    padding?: string;
-  }
-  option?: {
-    padding?: string;
-    borderRadius?: string;
-    icon?: {
-      color?: string;
-      focusColor?: string;
-    }
-  }
-  optionGroup?: {
-    padding?: string;
-    fontWeight?: string;
-  }
-}
-
-interface ProcessedNavigation {
-  list?: {
-    padding?: string;
-    gap?: string;
-  }
-  item?: {
-    padding?: string;
-    borderRadius?: string;
-    gap?: string;
-  }
-  submenuLabel?: {
-    padding?: string;
-    fontWeight?: string;
-  }
-  submenuIcon?: {
-    color?: string;
-    focusColor?: string;
-    activeColor?: string;
-    size?: string;
-  }
 }
 
 function isShadowValue(value: any): value is ShadowValue {
@@ -139,319 +64,262 @@ function processBoxShadow(value: any): string | undefined {
   return undefined;
 }
 
-function processFormField(field: any): ProcessedFormField {
-  const result: ProcessedFormField = {};
+function processFormField(field: TokenNode): ProcessedToken {
+  const result: ProcessedToken = {};
 
-  const background = field.background?.$value || field.background;
-  if (background !== undefined) {
-    result.background = background;
-  }
+  if (!field || typeof field !== 'object') return result;
 
-  const borderColor = field.border?.color?.$value;
-  if (borderColor !== undefined) {
-    result.borderColor = borderColor;
-  }
+  for (const [key, value] of Object.entries(field)) {
+    if (value === undefined) continue;
 
-  const borderRadius = field.border?.radius?.$value || field.borderRadius?.$value;
-  if (borderRadius !== undefined) {
-    result.borderRadius = borderRadius;
-  }
-
-  const color = field.color?.$value || field.color;
-  if (color !== undefined) {
-    result.color = color;
-  }
-
-  const disabledBackground = field.disabled?.background?.$value || field.disabled?.background;
-  if (disabledBackground !== undefined) {
-    result.disabledBackground = disabledBackground;
-  }
-
-  const disabledColor = field.disabled?.color?.$value || field.disabled?.color;
-  if (disabledColor !== undefined) {
-    result.disabledColor = disabledColor;
-  }
-
-  const filledBackground = field.filled?.background?.$value || field.filled?.background;
-  if (filledBackground !== undefined) {
-    result.filledBackground = filledBackground;
-  }
-
-  const filledFocusBackground = field.filled?.focus?.background?.$value || field.filled?.focus?.background;
-  if (filledFocusBackground !== undefined) {
-    result.filledFocusBackground = filledFocusBackground;
-  }
-
-  const filledHoverBackground = field.filled?.hover?.background?.$value || field.filled?.hover?.background; 
-  if (filledHoverBackground !== undefined) {
-    result.filledHoverBackground = filledHoverBackground;
-  }
-
-  const floatLabelColor = field.float?.label?.color?.$value || field.float?.label?.color;
-  if (floatLabelColor !== undefined) {
-    result.floatLabelColor = floatLabelColor;
-  }
-
-  const floatLabelFocusColor = field.float?.label?.focus?.color?.$value || field.float?.label?.focus?.color;  
-  if (floatLabelFocusColor !== undefined) {
-    result.floatLabelFocusColor = floatLabelFocusColor;
-  }
-
-  const floatLabelInvalidColor = field.float?.label?.invalid?.color?.$value || field.float?.label?.invalid?.color;
-  if (floatLabelInvalidColor !== undefined) {
-    result.floatLabelInvalidColor = floatLabelInvalidColor;
-  }
-
-  const focusBorderColor = field.focus?.border?.color?.$value;
-  if (focusBorderColor !== undefined) {
-    result.focusBorderColor = focusBorderColor;
-  }
-
-  if (field.focus?.ring) {
-    const focusRingProps = {
-      width: field.focus.ring.width?.$value || field.focus.ring.width,
-      style: field.focus.ring.style?.$value || field.focus.ring.style,
-      color: field.focus.ring.color?.$value || field.focus.ring.color,
-      offset: field.focus.ring.offset?.$value || field.focus.ring.offset,
-      shadow: processBoxShadow(field.focus.ring.shadow?.$value) || processBoxShadow(field.focus.ring.shadow)
-    };
-    if (Object.values(focusRingProps).some(v => v !== undefined)) {
-      result.focusRing = focusRingProps;
-    }
-  }
-
-  const fontSize = field.font?.size?.$value || field.fontSize?.$value;
-  if (fontSize !== undefined) {
-    result.fontSize = fontSize;
-  }
-
-  const hoverBorderColor = field.hover?.border?.color?.$value || field.hover?.borderColor;
-  if (hoverBorderColor !== undefined) {
-    result.hoverBorderColor = hoverBorderColor;
-  }
-
-  const iconColor = field.icon?.color?.$value || field.icon?.color;
-  if (iconColor !== undefined) {
-    result.iconColor = iconColor;
-  }
-
-  const invalidBorderColor = field.invalid?.border?.color?.$value || field.invalid?.borderColor;
-  if (invalidBorderColor !== undefined) {
-    result.invalidBorderColor = invalidBorderColor;
-  }
-
-  const invalidPlaceholderColor = field.invalid?.placeholder?.color?.$value || field.invalid?.placeholder?.color;
-  if (invalidPlaceholderColor !== undefined) {
-    result.invalidPlaceholderColor = invalidPlaceholderColor;
-  }
-
-  if (field.lg) {
-    const lgProps = {
-      paddingX: field.lg.padding?.x?.$value || field.lg.padding?.x,
-      paddingY: field.lg.padding?.y?.$value || field.lg.padding?.y,
-      fontSize: field.lg.font?.size?.$value || field.lg.font?.size
-    };
-    if (Object.values(lgProps).some(v => v !== undefined)) {
-      result.lg = lgProps;
-    }
-  }
-
-  const paddingX = field.padding?.x?.$value || field.padding?.x;
-  if (paddingX !== undefined) {
-    result.paddingX = paddingX;
-  }
-
-  const paddingY = field.padding?.y?.$value || field.padding?.y;
-  if (paddingY !== undefined) {
-    result.paddingY = paddingY;
-  } 
-
-  const placeholderColor = field.placeholder?.color?.$value || field.placeholder?.color;
-  if (placeholderColor !== undefined) {
-    result.placeholderColor = placeholderColor;
-  }
-
-  const shadow = field.shadow?.$value || field.shadow;
-  if (shadow !== undefined) {
-    result.shadow = processBoxShadow(field.shadow?.$value) || processBoxShadow(field.shadow)
-  }
-
-  if (field.sm) {
-    const smProps = {
-      paddingX: field.sm.padding?.x?.$value || field.sm.padding?.x,
-      paddingY: field.sm.padding?.y?.$value || field.sm.padding?.y,
-      fontSize: field.sm.font?.size?.$value || field.sm.font?.size
-    };
-    if (Object.values(smProps).some(v => v !== undefined)) {
-      result.sm = smProps;
-    }
-  }
-
-  const transitionDuration = field.transition?.duration?.$value || field.transitionDuration?.$value;
-  if (transitionDuration !== undefined) {
-    result.transitionDuration = transitionDuration;
-  }
-
-  return result;
-}
-
-function processList(field: any): ProcessedList {
-  const result: ProcessedList = {};
-
-  const padding = field.padding?.$value || field.padding;
-  if (padding !== undefined) {
-    result.padding = padding;
-  }
-
-  const gap = field.gap?.$value || field.gap;
-  if (gap !== undefined) {
-    result.gap = gap;
-  }
-
-  const headerPadding = field.header?.padding?.$value || field.header?.padding;
-  if (headerPadding !== undefined) {
-    result.header = {
-      padding: headerPadding
-    };
-  }
-
-  if (field.option) {
-    const optionProps: any = {
-      borderRadius: field.option.border?.radius?.$value,
-      focusBackground: field.option.focus?.background?.$value,
-      selectedBackground: field.option.selected?.background?.$value,
-      selectedFocusBackground: field.option.selected?.focus?.background?.$value,
-      color: field.option.color?.$value,
-      focusColor: field.option.focus?.color?.$value,
-      selectedColor: field.option.selected?.color?.$value,
-      selectedFocusColor: field.option.selected?.focus?.color?.$value,
-      padding: field.option.padding?.$value
-    };
-
-    if (field.option?.icon) {
-      const iconColor = field.option.icon?.color?.$value;
-      const iconFocusColor = field.option.icon?.focus?.color?.$value;
-      
-      if (iconColor !== undefined || iconFocusColor !== undefined) {
-        optionProps.icon = {
-          color: iconColor,
-          focusColor: iconFocusColor
+    if (key === 'padding') {
+      const paddingValue = value as TokenNode;
+      result.paddingX = paddingValue?.x?.$value;
+      result.paddingY = paddingValue?.y?.$value;
+    } else if (key === 'border') {
+      const borderValue = value as TokenNode;
+      result.borderRadius = borderValue?.radius?.$value;
+    } else if (key === 'transition') {
+      const transitionValue = value as TokenNode;
+      result.transitionDuration = transitionValue.duration.$value as string;
+    } else if (key === 'disabled') {
+      const disabledValue = value as TokenNode;
+      result.disabledColor = disabledValue.color.$value;
+      result.disabledBackground = disabledValue.background.$value;
+    } else if (key === 'icon') {
+      const iconValue = value as TokenNode;
+      result.iconColor = iconValue.color.$value;
+    } else if (key === 'hover') {
+      const hoverValue = value as {
+        border: {
+          color: TokenLeaf;
         };
-      }
-    }
-
-    if (Object.values(optionProps).some(v => v !== undefined)) {
-      result.option = optionProps;
-    }
-
-    if (field.option.group) {
-      const groupProps = {
-        fontWeight: field.option.group.font?.weight?.$value,
-        background: field.option.group.background?.$value,
-        color: field.option.group.color?.$value,
-        padding: field.option.group.padding?.$value
       };
-      if (Object.values(groupProps).some(v => v !== undefined)) {
-        result.optionGroup = groupProps;
+      result.hoverBorderColor = hoverValue.border.color.$value;
+    } else if (key === 'invalid') {
+      const invalidValue = value as {
+        border: {
+          color: TokenLeaf;
+        };
+        placeholder: {
+          color: TokenLeaf;
+        };
+      };
+      result.invalidBorderColor = invalidValue.border.color.$value;
+      result.invalidPlaceholderColor = invalidValue.placeholder.color.$value;
+    } else if (key === 'filled') {
+      const filledValue = value as {
+        background: TokenLeaf;
+        focus: {
+          background: TokenLeaf;
+        };
+        hover: {
+          background: TokenLeaf;
+        };
+      };
+      result.filledBackground = filledValue.background.$value;
+      result.filledFocusBackground = filledValue.focus.background.$value;
+      result.filledHoverBackground = filledValue.hover.background.$value;
+    } else if (key === 'float') {
+      const floatValue = value as {
+        label: {
+          color: TokenLeaf;
+          focus: {
+            color: TokenLeaf;
+          };
+          invalid: {
+            color: TokenLeaf;
+          };
+          active: {
+            color: TokenLeaf;
+          };
+        };
+      };
+      result.floatLabelColor = floatValue.label.color.$value;
+      result.floatLabelFocusColor = floatValue.label.focus.color.$value;
+      result.floatLabelInvalidColor = floatValue.label.invalid.color.$value;
+      result.floatLabelActiveColor = floatValue.label.active.color.$value;
+    } else if (key === 'focus') {
+        const { ring } = value as any;
+        const ringProcessed = processTokenValue(ring, {}, []);
+        result.focusRing = ringProcessed;
+    } else if (key === 'sm' || key === 'lg') {
+      const sizeValue = value as {
+        font: {
+          size: TokenLeaf;
+        };
+        padding: {
+          x: TokenLeaf;
+          y: TokenLeaf;
+        };
+      };
+      result[key] = {
+        fontSize: sizeValue?.font?.size?.$value,
+        paddingX: sizeValue?.padding?.x?.$value,
+        paddingY: sizeValue?.padding?.y?.$value
+      };
+    } else {
+      const processed = processTokenValue(value, {}, []);
+      if (processed !== undefined) {
+        result[key] = processed;
       }
     }
   }
-  
+
   return result;
 }
 
-function processNavigation(field: any): ProcessedNavigation {
-  const result: ProcessedNavigation = {};
+function processList(field: TokenNode): ProcessedToken {
+  const result: ProcessedToken = {};
 
-  if (field.list) {
-    const listProps = {
-      padding: field.list.padding?.$value,
-      gap: field.list.gap?.$value
-    };
-    if (Object.values(listProps).some(v => v !== undefined)) {
-      result.list = listProps;
-    }
-  }
+  if (!field || typeof field !== 'object') return result;
 
-  if (field.item) {
-    const itemProps: any = {
-      padding: field.item.padding?.$value,
-      borderRadius: field.item.border?.radius?.$value,
-      gap: field.item.gap?.$value,
-      focusBackground: field.item.focus?.background?.$value,
-      activeBackground: field.item.active?.background?.$value,
-      color: field.item.color?.$value,
-      focusColor: field.item.focus?.color?.$value,
-      activeColor: field.item.active?.color?.$value
-    };
+  for (const [key, value] of Object.entries(field)) {
+    if (value === undefined) continue;
 
-    if (field.item?.icon) {
-      const iconColor = field.item.icon?.color?.$value;
-      const iconFocusColor = field.item.icon?.focus?.color?.$value;
+    if (key === 'option') {
+      const { group, selected, icon, ...optionWithoutGroup } = value as any;
+      const optionProcessed = processTokenValue(optionWithoutGroup, {}, []);
       
-      if (iconColor !== undefined || iconFocusColor !== undefined) {
-        itemProps.icon = {
-          color: iconColor,
-          focusColor: iconFocusColor
+      if (selected) {
+        const selectedValue = selected as {
+          background: TokenLeaf;
+          focus: {
+            background: TokenLeaf;
+            color: TokenLeaf;
+          };
+          color: TokenLeaf;
+        };
+        optionProcessed.selectedBackground = selectedValue.background.$value;
+        optionProcessed.selectedColor = selectedValue.color.$value;
+        optionProcessed.selectedFocusBackground = selectedValue.focus.background.$value;
+        optionProcessed.selectedFocusColor = selectedValue.focus.color.$value;
+      }
+
+      if (icon) {
+        const iconValue = icon as {
+          color: TokenLeaf;
+          focus: {
+            color: TokenLeaf;
+          };
+        };
+        optionProcessed.icon = {
+          color: iconValue.color.$value,
+          focusColor: iconValue.focus.color.$value
         };
       }
-    }
+      
+      result.option = optionProcessed;
 
-    if (Object.values(itemProps).some(v => v !== undefined)) {
-      result.item = itemProps;
-    }
-  }
-
-  if (field.submenu?.label) {
-    const labelProps = {
-      background: field.submenu.label.background?.$value,
-      color: field.submenu.label.color?.$value,
-      padding: field.submenu.label.padding?.$value,
-      fontWeight: field.submenu.label.font?.weight?.$value
-    };
-    if (Object.values(labelProps).some(v => v !== undefined)) {
-      result.submenuLabel = labelProps;
-    }
-  }
-
-  if (field.submenu?.icon) {
-    const iconProps = {
-      color: field.submenu.icon.color?.$value,
-      focusColor: field.submenu.icon.focus?.color?.$value,
-      activeColor: field.submenu.icon.active?.color?.$value,
-      size: field.submenu.icon.size?.$value
-    };
-    if (Object.values(iconProps).some(v => v !== undefined)) {
-      result.submenuIcon = iconProps;
+      // Process optionGroup properties
+      const groupProcessed = processTokenValue(group, {}, []);
+      result.optionGroup = groupProcessed;
+    } else {
+      const processed = processTokenValue(value, {}, []);
+      if (processed !== undefined) {
+        result[key] = processed;
+      }
     }
   }
 
   return result;
 }
-  
+
+function processNavigation(field: TokenNode): ProcessedToken {
+  const result: ProcessedToken = {};
+
+  if (!field || typeof field !== 'object') return result;
+
+  for (const [key, value] of Object.entries(field)) {
+    if (value === undefined) continue;
+
+    if (key === 'submenu') {
+      const { label, icon } = value as any;
+      const labelProcessed = processTokenValue(label, {}, []);
+      result.submenuLabel = labelProcessed;
+
+      const iconProcessed = processTokenValue(icon, {}, []);
+      result.submenuIcon = iconProcessed;
+    } else if (key === 'item') {
+      const { icon, ...itemWithoutIcon } = value as any;
+      const itemProcessed = processTokenValue(itemWithoutIcon, {}, []);
+      
+      if (icon) {
+        const iconValue = icon as {
+          color: TokenLeaf;
+          focus: {
+            color: TokenLeaf;
+          };
+          active: {
+            color: TokenLeaf;
+          };
+        };
+        itemProcessed.icon = {
+          color: iconValue.color.$value,
+          focusColor: iconValue.focus.color.$value,
+          activeColor: iconValue.active.color.$value
+        };
+      }
+      
+      result.item = itemProcessed;
+    } else {
+      const processed = processTokenValue(value, {}, []);
+      if (processed !== undefined) {
+        result[key] = processed;
+      }
+    }
+  }
+
+  return result;
+}
+
 // Special token transformations mapping
 const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
+  'hover.border.color': 'hoverBorderColor',
+  'filled.focus.background': 'filledFocusBackground',
+  'filled.hover.background': 'filledHoverBackground',
+  'float.label.active.color': 'floatLabelActiveColor',
+  'float.label.color': 'floatLabelColor',
+  'float.label.focus.color': 'floatLabelFocusColor',
+  'float.label.invalid.color': 'floatLabelInvalidColor',
+  'focus.border.color': 'focusBorderColor',
+  'invalid.border.color': 'invalidBorderColor',
+  'invalid.placeholder.color': 'invalidPlaceholderColor',
+  'active.background': 'activeBackground',
   'active.color': 'activeColor',
   'anchor.gutter': 'anchorGutter',
   'border.color': 'borderColor',
   'border.radius': 'borderRadius',
   'contrast.color': 'contrastColor',
+  'disabled.background': 'disabledBackground',
   'disabled.color': 'disabledColor',
   'disabled.opacity': 'disabledOpacity',
+  'filled.background': 'filledBackground',
   'focus.background': 'focusBackground',
   'focus.color': 'focusColor',
   'focus.ring': 'focusRing',
+  'font.size': 'fontSize',
+  'font.weight': 'fontWeight',
   'form.field': 'formField',
   'hover.background': 'hoverBackground',
   'hover.color': 'hoverColor',
   'hover.muted.color': 'hoverMutedColor',
   'icon.size': 'iconSize',
+  'icon.color': 'iconColor',
   'muted.color': 'mutedColor',
+  'option.group': 'optionGroup',
+  'placeholder.color': 'placeholderColor',
+  'selected.background': 'selectedBackground',
+  'selected.focus.background': 'selectedFocusBackground',
+  'selected.focus.color': 'selectedFocusColor',
+  'selected.color': 'selectedColor',
+  'submenu.icon': 'submenuIcon',
+  'submenu.label': 'submenuLabel',
   'transition.duration': 'transitionDuration',
 };
 
 // Parent properties that might need transformation
-const TRANSFORM_PARENTS = new Set(['active', 'anchor', 'border', 'contrast', 'disabled', 'focus', 'form', 'hover', 'icon', 'muted', 'transition']);
+const TRANSFORM_PARENTS = new Set(['active', 'anchor', 'border', 'contrast', 'disabled', 'filled', 'float', 'focus', 'font', 'form', 'hover', 'icon', 'invalid', 'muted', 'option', 'placeholder', 'selected', 'submenu', 'transition']);
   
 function shouldTransform(path: string[]): boolean {
   const pathStr = path.join('.');
@@ -477,34 +345,64 @@ function processTransformableToken(
 ): void {
   if (!tokenValue || typeof tokenValue !== 'object') return;
 
+  // Initialize the result object for this token key if it doesn't exist
+  if (!result[tokenKey]) {
+    result[tokenKey] = {};
+  }
+
   for (const [key, value] of Object.entries(tokenValue)) {
     const newPath = [...currentPath, key];
-
     if (shouldTransform(newPath)) {
       const transformedKey = getTransformedKey(newPath);
-      const processed = processTokenValue(value as Token, primitiveTokens, newPath);
+      const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
       if (processed !== undefined) {
-        result[transformedKey] = processed;
+        const currentKeyIndex = newPath.indexOf(key);
+        const parentKey = newPath[currentKeyIndex - 1];
+        const pathStr = newPath.join('.');
+        const matchingPattern = Object.keys(TOKEN_TRANSFORMATIONS).find(pattern => pathStr.endsWith(pattern));
+        
+        if (matchingPattern && matchingPattern.split('.').length >= 3) {
+          // If the matching pattern has 3 or more segments, store directly under transformed key
+          result[transformedKey] = processed;
+        } else if (parentKey === tokenKey) {
+          // If the parent key is the same as the token key, store directly under transformed key
+          result[transformedKey] = processed;
+        } else if (newPath.includes(tokenKey)) {
+          // If the token key is anywhere in the path, store under token key's object
+          result[tokenKey][transformedKey] = processed;
+        } else {
+          // If no transformation pattern matches and token key is not in path, store under token key's object
+          result[tokenKey][transformedKey] = processed;
+        }
       }
-
     } else if (typeof value === 'object' && value !== null && '$type' in value && '$value' in value) {
-      // Process ultimate token values to return only value instead of object with $type and $value, e.g. disabled.color
-      const processed = processTokenValue(tokenValue, primitiveTokens, newPath);
+      // Handle grandchild token values if it doesn't match transformable token
+      const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
       if (processed !== undefined) {
-       result[tokenKey] = processed;
+        result[tokenKey][key] = processed;
       }
-
+    } else if (typeof tokenValue === 'object' && value !== null && '$type' in tokenValue && '$value' in tokenValue) {
+      // Handle child token values if it doesn't match transformable token
+      const processed = processTokenValue(tokenValue as TokenLeaf, primitiveTokens, newPath);
+      if (processed !== undefined) {
+        result[tokenKey] = processed;
+      }
     } else if (typeof value === 'object' && value !== null) {
-      // Recursively process nested object tokens, e.g. muted.color in hover.muted.color
+      // Process nested objects recursively
       processTransformableToken(tokenKey, value, newPath, result, primitiveTokens);
     } else {
       throw new Error(`Could not process token properly: ${JSON.stringify(tokenValue)} at path ${currentPath.join('.')}`);
     }
   }
+
+  // Remove empty objects from result
+  if (result[tokenKey] && Object.keys(result[tokenKey]).length === 0) {
+    delete result[tokenKey];
+  }
 }
 
 function processTokenValue(
-  token: Token | string | number | object | null | undefined, 
+  token: TokenLeaf | string | object | null | undefined, 
   primitiveTokens: any,
   currentPath: string[] = []
 ): any {
@@ -512,8 +410,8 @@ function processTokenValue(
 
   // Process ultimate token values to return only value instead of object with $type and $value
   if (typeof token === 'object' && '$type' in token && '$value' in token) {
-    const value = (token as Token).$value;
-    const type = (token as Token).$type;
+    const value = (token as TokenLeaf).$value;
+    const type = (token as TokenLeaf).$type;
     
     switch (type) {
       case 'boxShadow':
@@ -549,8 +447,7 @@ function processTokenValue(
       } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
         // Transformable token, e.g. border.color to borderColor
         processTransformableToken(key, value, newPath, result, primitiveTokens);
-
-      } else if (!shouldTransform(newPath)) {
+      } else {
         const processed = processTokenValue(value, primitiveTokens, newPath);
         if (processed !== undefined) {
           result[key] = processed;
