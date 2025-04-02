@@ -4,13 +4,22 @@
   "description": "Theme generator for PrimeVue components",
   "main": "src/index.ts",
   "scripts": {
-    "theme": "ts-node src/index.ts"
+    "theme": "ts-node src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
-  "keywords": ["primevue", "theme", "generator"],
+  "keywords": [
+    "primevue",
+    "theme",
+    "generator"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^20.11.24",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
