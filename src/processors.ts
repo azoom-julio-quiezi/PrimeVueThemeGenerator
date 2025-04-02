@@ -43,6 +43,7 @@ export function processFormField(field: TokenNode): ProcessedToken {
         paddingY: sizeValue?.padding?.y?.$value
       };
     } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
+      // Since TypeScript doesn't know that TRANSFORM_PARENTS only has string keys, we need to cast to unknown and then to TokenValue
       processTransformableToken(key, (value as unknown) as TokenValue, [key], result, {});
     } else {
       const processed = processTokenValue(value, {}, []);
@@ -173,32 +174,51 @@ export function processTransformableToken(
         if (shouldTransform(newPath)) {
           const transformedKey = getTransformedKey(newPath);
           
-          if (typeof value === 'object' && value !== null && '$type' in value && '$value' in value) {
-            const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
-            if (processed !== undefined) {
-              const currentKeyIndex = newPath.indexOf(key);
-              const parentKey = newPath[currentKeyIndex - 1];
-              const pathStr = newPath.join('.');
-              const matchingPattern = Object.keys(TOKEN_TRANSFORMATIONS).find(pattern => pathStr.endsWith(pattern));
-              
-              try {
-                if (matchingPattern && matchingPattern.split('.').length >= 3) {
-                  result[transformedKey] = processed;
-                } else if (parentKey === tokenKey) {
-                  result[transformedKey] = processed;
-                } else if (newPath.includes(tokenKey)) {
-                  const tokenKeyObj = result[tokenKey] as ProcessedToken;
-                  tokenKeyObj[transformedKey] = processed;
-                } else {
-                  const tokenKeyObj = result[tokenKey] as ProcessedToken;
-                  tokenKeyObj[transformedKey] = processed;
+          if (typeof value === 'object' && value !== null) {
+            // Check if it's a leaf token with $type and $value
+            if ('$type' in value && '$value' in value) {
+              const processed = processTokenValue(value as TokenLeaf, primitiveTokens, newPath);
+              if (processed !== undefined) {
+                const currentKeyIndex = newPath.indexOf(key);
+                const parentKey = newPath[currentKeyIndex - 1];
+                const pathStr = newPath.join('.');
+                const matchingPattern = Object.keys(TOKEN_TRANSFORMATIONS).find(pattern => pathStr.endsWith(pattern));
+                
+                try {
+                  if (matchingPattern && matchingPattern.split('.').length >= 3) {
+                    result[transformedKey] = processed;
+                  } else if (parentKey === tokenKey) {
+                    result[transformedKey] = processed;
+                  } else if (newPath.includes(tokenKey)) {
+                    const tokenKeyObj = result[tokenKey] as ProcessedToken;
+                    tokenKeyObj[transformedKey] = processed;
+                  } else {
+                    const tokenKeyObj = result[tokenKey] as ProcessedToken;
+                    tokenKeyObj[transformedKey] = processed;
+                  }
+                } catch (error) {
+                  console.warn(`Warning: Failed to store processed token at path ${newPath.join('.')}:`, error);
                 }
-              } catch (error) {
-                console.warn(`Warning: Failed to store processed token at path ${newPath.join('.')}:`, error);
+              }
+            } else {
+              // Handle nested structure - process each child
+              const processedNested: ProcessedToken = {};
+              for (const [nestedKey, nestedValue] of Object.entries(value)) {
+                if (typeof nestedValue === 'object' && nestedValue !== null && '$type' in nestedValue && '$value' in nestedValue) {
+                  if (nestedValue.$type === 'boxShadow') {
+                    const shadowValue = processBoxShadow(nestedValue.$value as ShadowValue);
+                    if (shadowValue !== undefined) {
+                      processedNested[nestedKey] = shadowValue;
+                    }
+                  } else {
+                    processedNested[nestedKey] = (nestedValue as TokenLeaf).$value;
+                  }
+                }
+              }
+              if (Object.keys(processedNested).length > 0) {
+                result[transformedKey] = processedNested;
               }
             }
-          } else {
-            console.warn(`Warning: Invalid token value at path ${newPath.join('.')}:`, value);
           }
         } else if (typeof value === 'object' && value !== null) {
           if ('$type' in value && '$value' in value) {
@@ -283,6 +303,7 @@ export function processTokenValue(
               result.navigation = processedNavigation;
             }
           } else if (TRANSFORM_PARENTS.has(key) && typeof value === 'object') {
+            // Since TypeScript doesn't know that TRANSFORM_PARENTS only has string keys, we need to cast to unknown and then to TokenValue
             processTransformableToken(key, (value as unknown) as TokenValue, newPath, result, primitiveTokens);
           } else {
             const processed = processTokenValue(value, primitiveTokens, newPath);

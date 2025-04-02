@@ -1,4 +1,4 @@
-import { TokenNode, TokenLeaf } from './types';
+import { TokenNode, TokenLeaf, ShadowValue } from './types';
 
 export function validateTokenStructure(token: TokenNode | TokenLeaf): boolean {
   if (!token || typeof token !== 'object') {
@@ -11,17 +11,28 @@ export function validateTokenStructure(token: TokenNode | TokenLeaf): boolean {
     return true;
   }
 
-  // Check if it's a leaf node (has $type and $value)
-  if ('$type' in token && '$value' in token) {
+  // Check if it's a leaf node (has both $type and $value)
+  if ('$value' in token) {
+    if (!('$type' in token)) {
+      return false;
+    }
+
+    // Validate shadow values
+    if (token.$type === 'boxShadow' || token.$type === 'shadow') {
+      const shadowValue = token.$value as ShadowValue;
+      return (
+        typeof shadowValue === 'object' &&
+        'x' in shadowValue &&
+        'y' in shadowValue &&
+        shadowValue.type === 'dropShadow'
+      );
+    }
+
     return true;
   }
 
   // For non-leaf nodes, validate all children
   for (const [key, value] of Object.entries(token)) {
-    // Skip numeric keys (array indices)
-    if (/^\d+$/.test(key)) {
-      continue;
-    }
     
     if (!validateTokenStructure(value)) {
       console.warn(`Invalid token structure at key: ${key}`);
