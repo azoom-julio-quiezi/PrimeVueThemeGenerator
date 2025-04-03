@@ -20,7 +20,7 @@ export function processColorScheme(tokens: TokenNode, primitiveTokens: Processed
   };
 }
 
-export function generateTheme(tokens: TokenNode): TokenSet {
+export function createThemeStructure(tokens: TokenNode): TokenSet {
   const primitive = processPrimitiveTokens(tokens);
   const semantic = processSemanticTokens(tokens, primitive);
   const { light, dark } = processColorScheme(tokens, primitive);

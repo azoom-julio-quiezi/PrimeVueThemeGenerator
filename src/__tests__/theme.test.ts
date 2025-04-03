@@ -1,6 +1,6 @@
 /// <reference types="jest" />
-import { processPrimitiveTokens, processSemanticTokens, processColorScheme, generateTheme } from '../theme';
-import { TokenNode, TokenLeaf, ProcessedToken } from '../types';
+import { processPrimitiveTokens, processSemanticTokens, processColorScheme, createThemeStructure } from '../theme';
+import { TokenNode, TokenLeaf } from '../types';
 
 describe('Theme Generation', () => {
   // Common test data
@@ -128,9 +128,9 @@ describe('Theme Generation', () => {
     });
   });
 
-  describe('Theme Generation', () => {
-    describe('generateTheme', () => {
-      it('should generate a complete theme', () => {
+  describe('Theme Structure', () => {
+    describe('createThemeStructure', () => {
+      it('should create a complete theme structure', () => {
         const completeTokens: TokenNode = {
           ...mockTokens.primitive.simple,
           ...mockTokens.semantic.simple,
@@ -145,7 +145,7 @@ describe('Theme Generation', () => {
           }
         };
 
-        const result = generateTheme(completeTokens);
+        const result = createThemeStructure(completeTokens);
         expect(result).toEqual(expectedTheme);
       });
     });
