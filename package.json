@@ -6,6 +6,10 @@
   "bin": {
     "primevue-theme": "./dist/cli.js"
   },
+  "files": [
+    "dist",
+    "assets"
+  ],
   "scripts": {
     "create": "ts-node src/cli.ts create --output ./test",
     "convert-tokens": "ts-node src/cli.ts convert-tokens -i ./tokens/tokens.json -o ./test/themes/theme-tokens.ts",
@@ -22,6 +26,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/commander": "^2.12.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.11.24",
     "jest": "^29.7.0",
@@ -30,6 +35,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@primeuix/themes": "1.0.1",
     "commander": "^13.1.0"
   }
 }
