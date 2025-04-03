@@ -11,8 +11,8 @@
     "convert-tokens": "ts-node src/cli.ts convert-tokens -i ./tokens/tokens.json -o ./test/themes/theme-tokens.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "tsc",
-    "prepare": "npm run build && mkdir -p dist && chmod +x dist/cli.js"
+    "build": "rm -rf dist && tsc",
+    "prepare": "npm run build && test -f dist/cli.js && chmod +x dist/cli.js"
   },
   "keywords": [
     "primevue",
