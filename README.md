@@ -14,8 +14,7 @@ A tool that provides a default PrimeVue theme (Azoom theme) and converts Studio 
 ## Installation
 
 ```bash
-# Install globally from repository
-npm install -g git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
+npm install git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
 
 ## Usage
