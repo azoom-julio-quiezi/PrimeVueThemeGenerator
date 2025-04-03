@@ -20,33 +20,26 @@ const program = new Command();
 program
   .command('create')
   .description('Create a new PrimeVue theme structure')
-  .option('-o, --output <path>', 'Output directory', './themes')
+  .option('-o, --output <path>', 'Output directory', './assets')
   .action((options: BaseOptions) => {
     try {
       const outputDir = options.output;
-      const outputAssetsDir = join(outputDir, 'assets');
       
       const packageAssetsDir = join(__dirname, '../assets');
       
+      if (!existsSync(packageAssetsDir)) {
+        console.error('Error: Package assets directory not found. Please ensure the package is properly installed.');
+        process.exit(1);
+      }
+
       if (!existsSync(outputDir)) {
         mkdirSync(outputDir, { recursive: true });
         console.log(`Created directory: ${outputDir}`);
       }
 
-      if (!existsSync(outputAssetsDir)) {
-        mkdirSync(outputAssetsDir, { recursive: true });
-        console.log(`Created directory: ${outputAssetsDir}`);
-      }
-
-      if (existsSync(packageAssetsDir)) {
-        copyTemplateFiles(packageAssetsDir, outputAssetsDir);
-      } else {
-        console.error('Warning: Package assets directory not found. Creating empty structure.');
-        mkdirSync(join(outputAssetsDir, 'themes'), { recursive: true });
-        mkdirSync(join(outputAssetsDir, 'styles'), { recursive: true });
-      }
+      copyTemplateFiles(packageAssetsDir, outputDir);
       
-      console.log(`\nTheme structure created successfully in ${outputDir}/assets!`);
+      console.log(`\nTheme structure created successfully in ${outputDir}!`);
     } catch (error) {
       console.error('Error creating theme structure:', error);
       process.exit(1);
