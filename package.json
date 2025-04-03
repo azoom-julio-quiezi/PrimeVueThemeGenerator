@@ -12,7 +12,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "tsc",
-    "prepare": "npm run build && chmod +x dist/cli.js"
+    "prepare": "npm run build && mkdir -p dist && chmod +x dist/cli.js"
   },
   "keywords": [
     "primevue",
