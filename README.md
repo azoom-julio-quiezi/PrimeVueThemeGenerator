@@ -22,31 +22,29 @@ npm install git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ### Create Theme Structure
 ```bash
 # Create base theme structure
-primevue-theme create
+npx primevue-theme create
 
 # Or specify output directory
-primevue-theme create -o ./custom/path
+npx primevue-theme create -o ./custom/path
 ```
 
 This creates:
 ```
-themes/
-├── themes/       # Theme files
-│   ├── aura/    # Base Aura preset
-│   └── default.ts
-└── styles/      # Component styles
+assets/
+├── themes/      # Theme files
+└── styles/      # General styles
 ```
 
 ### Convert Tokens
 ```bash
 # Convert tokens using default paths
-primevue-theme convert-tokens -i ./tokens/tokens.json
+npx primevue-theme convert-tokens -i ./tokens/tokens.json
 
 # Specify output path
-primevue-theme convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
+npx primevue-theme convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
 
 # Force overwrite existing file
-primevue-theme convert-tokens -i ./tokens/tokens.json -f
+npx primevue-theme convert-tokens -i ./tokens/tokens.json -f
 ```
 
 ### Using Generated Tokens
@@ -58,13 +56,11 @@ import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import { tokens } from './theme-tokens';
 import button from './button/button';
-import menubar from './menubar/menubar';
 
 const Default = definePreset(Aura, {
   ...tokens,
   components: {
     button,
-    menubar,
   },
 });
 
@@ -97,6 +93,7 @@ The project is built with TypeScript and uses:
 │   ├── validation.ts      # Token validation
 │   └── __tests__/        # Test files
 ├── assets/               # Base theme files
+│   ├── styles/          # General styles
 │   └── themes/          # Theme templates
 ├── package.json         # Project configuration
 └── tsconfig.json       # TypeScript configuration
