@@ -1,12 +1,18 @@
 {
-  "name": "primevue-theme-generator",
+  "name": "@azoom/primevue-theme-generator",
   "version": "1.0.0",
   "description": "Theme generator for PrimeVue components",
   "main": "src/index.ts",
+  "bin": {
+    "primevue-theme": "./dist/cli.js"
+  },
   "scripts": {
-    "theme": "ts-node src/index.ts",
+    "create": "ts-node src/cli.ts create --output ./test",
+    "convert-tokens": "ts-node src/cli.ts convert-tokens -i ./tokens/tokens.json -o ./test/themes/theme-tokens.ts",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build": "tsc",
+    "prepare": "npm run build"
   },
   "keywords": [
     "primevue",
@@ -22,5 +28,8 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "commander": "^13.1.0"
   }
 }
