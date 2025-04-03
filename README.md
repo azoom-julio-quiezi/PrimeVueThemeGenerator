@@ -1,18 +1,92 @@
 # PrimeVue Theme Generator
 
-A tool to generate PrimeVue theme files from design tokens. This generator processes token files and creates theme configurations compatible with PrimeVue components.
+A tool that provides a default PrimeVue theme (Azoom theme) and converts Studio Tokens into theme tokens. This generator focuses only on primitive and semantic tokens - component-specific tokens are handled separately in your theme configuration.
 
 ## Features
 
-- Processes design tokens from JSON files
-- Generates theme files for PrimeVue components
-- Supports light and dark color schemes
-- Handles complex token transformations
+- Provides a base AZoom theme with component configurations
+- Converts Studio Tokens to primitive tokens (colors, spacing, etc.)
+- Converts Studio Tokens to semantic tokens with color schemes
+- Supports light and dark themes
 - Type-safe implementation with TypeScript
 - Comprehensive test coverage
 
-## Project Structure
+## Installation
 
+```bash
+# Install globally from repository
+npm install -g git+https://github.com/your-org/primevue-theme-generator.git
+```
+
+## Usage
+
+### Create Theme Structure
+```bash
+# Create base theme structure
+primevue-theme create
+
+# Or specify output directory
+primevue-theme create -o ./custom/path
+```
+
+This creates:
+```
+themes/
+├── themes/       # Theme files
+│   ├── aura/    # Base Aura preset
+│   └── default.ts
+└── styles/      # Component styles
+```
+
+### Convert Tokens
+```bash
+# Convert tokens using default paths
+primevue-theme convert-tokens -i ./tokens/tokens.json
+
+# Specify output path
+primevue-theme convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
+
+# Force overwrite existing file
+primevue-theme convert-tokens -i ./tokens/tokens.json -f
+```
+
+### Using Generated Tokens
+After generating tokens, import them in your theme file:
+
+```typescript
+// your-theme.ts
+import { definePreset } from '@primeuix/themes';
+import Aura from '@primeuix/themes/aura';
+import { tokens } from './theme-tokens';
+import button from './button/button';
+import menubar from './menubar/menubar';
+
+const Default = definePreset(Aura, {
+  ...tokens,
+  components: {
+    button,
+    menubar,
+  },
+});
+
+export default {
+  preset: Default,
+  options: {
+    darkModeSelector: '.p-dark',
+    // Add other options here
+  },
+};
+```
+
+## Development
+
+The project is built with TypeScript and uses:
+- `ts-node` for running TypeScript files directly
+- TypeScript for type safety
+- Node.js for file system operations
+- Jest for testing
+
+### Project Structure
 ```
 .
 ├── src/                    # Source code
@@ -23,52 +97,33 @@ A tool to generate PrimeVue theme files from design tokens. This generator proce
 │   ├── theme.ts           # Theme generation logic
 │   ├── validation.ts      # Token validation
 │   └── __tests__/        # Test files
-│       ├── processors.test.ts  # Token processor tests
-│       ├── theme.test.ts      # Theme generation tests
-│       └── validation.test.ts # Token validation tests
-├── tokens/                # Design token files
-│   └── tokens.json       # Main tokens file
-├── assets/               # Generated theme files
-│   └── themes/          # Theme output directory
+├── assets/               # Base theme files
+│   └── themes/          # Theme templates
 ├── package.json         # Project configuration
 └── tsconfig.json       # TypeScript configuration
 ```
 
-## Usage
-
-1. Install dependencies:
+### Local Development
 ```bash
+# Clone repository
+git clone https://github.com/your-org/primevue-theme-generator.git
+
+# Install dependencies
 npm install
+
+# Create test theme structure
+npm run create
+
+# Convert tokens (outputs to test directory)
+npm run convert-tokens
 ```
-
-2. Generate theme:
-```bash
-npm run theme
-```
-
-This will process the tokens from `tokens/tokens.json` and generate the theme file in `assets/themes/default.ts`.
-
-## Development
-
-The project is built with TypeScript and uses:
-- `ts-node` for running TypeScript files directly
-- TypeScript for type safety
-- Node.js for file system operations
-- Jest for testing
 
 ### Testing
 
-Run tests:
 ```bash
+# Run tests
 npm test
-```
 
-Watch mode for development:
-```bash
+# Watch mode for development
 npm run test:watch
 ```
-
-The test suite covers:
-- Token processing (color, spacing, shadow values)
-- Theme generation (primitive, semantic, color schemes)
-- Token validation
