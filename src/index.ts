@@ -36,7 +36,7 @@ export default {
   preset: Default,
 }`;
 
-  const outputPath = path.join(__dirname, '../assets/themes/default.ts');
+  const outputPath = path.join(__dirname, 'assets/themes/azoom-theme.ts');
   
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   
