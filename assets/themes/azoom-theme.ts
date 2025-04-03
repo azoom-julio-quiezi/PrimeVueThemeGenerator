@@ -1,7 +1,6 @@
 import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
 import button from './button/button'
-import menubar from './menubar/menubar'
 
 const Default = definePreset(Aura, {
   primitive: {
@@ -667,7 +666,6 @@ const Default = definePreset(Aura, {
 
   components: {
     button,
-    menubar,
   },
 });
 

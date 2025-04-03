@@ -92,37 +92,37 @@ export default {
       },
     },
   },
-  css: ({ dt }: { dt: (path: string) => string }) => `
+  css: (options: { dt: (path: string) => string | number | undefined }) => `
     .p-button:focus {
-      transition-duration: ${dt('button.az.transition.duration.fast')};
+      transition-duration: ${options.dt('button.az.transition.duration.fast')};
       transition-timing-function: ease-out;
     }
     .p-button:active {
-      transition-duration: ${dt('button.az.transition.duration.instant')};
+      transition-duration: ${options.dt('button.az.transition.duration.instant')};
     }
 
     .p-button-size-xlg {
-      font-size: ${dt('button.az.size.xlg.fontSize')};
-      padding-left: ${dt('button.az.size.xlg.paddingX')};
-      padding-right: ${dt('button.az.size.xlg.paddingX')};
-      padding-top: ${dt('button.az.size.xlg.paddingY')};
-      padding-bottom: ${dt('button.az.size.xlg.paddingY')};
+      font-size: ${options.dt('button.az.size.xlg.fontSize')};
+      padding-left: ${options.dt('button.az.size.xlg.paddingX')};
+      padding-right: ${options.dt('button.az.size.xlg.paddingX')};
+      padding-top: ${options.dt('button.az.size.xlg.paddingY')};
+      padding-bottom: ${options.dt('button.az.size.xlg.paddingY')};
     }
     .p-button-size-xsm {
-      font-size: ${dt('button.az.size.xsm.fontSize')};
-      padding-left: ${dt('button.az.size.xsm.paddingX')};
-      padding-right: ${dt('button.az.size.xsm.paddingX')};
-      padding-top: ${dt('button.az.size.xsm.paddingY')};
-      padding-bottom: ${dt('button.az.size.xsm.paddingY')};
+      font-size: ${options.dt('button.az.size.xsm.fontSize')};
+      padding-left: ${options.dt('button.az.size.xsm.paddingX')};
+      padding-right: ${options.dt('button.az.size.xsm.paddingX')};
+      padding-top: ${options.dt('button.az.size.xsm.paddingY')};
+      padding-bottom: ${options.dt('button.az.size.xsm.paddingY')};
     }
 
     .p-button-white-border {
-      border: ${dt('button.az.whiteBorder.border')};
+      border: ${options.dt('button.az.whiteBorder.border')};
     }
 
     .p-button-float {
-      box-shadow: ${dt('button.az.float.boxShadow')};
-      border: ${dt('button.az.float.border')};
+      box-shadow: ${options.dt('button.az.float.boxShadow')};
+      border: ${options.dt('button.az.float.border')};
     }
     .p-button-float:hover {
       box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.30), 0px 2px 8px 1px rgba(0, 0, 0, 0.10);
@@ -135,13 +135,13 @@ export default {
     }
     
     .p-button-outlined {
-      background: ${dt('button.az.outlined.primary.background')};
+      background: ${options.dt('button.az.outlined.primary.background')};
     }
     .p-button-outlined.p-button-secondary {
-      background: ${dt('button.az.outlined.secondary.background')};
+      background: ${options.dt('button.az.outlined.secondary.background')};
     }
     .p-button-outlined.p-button-danger {
-      background: ${dt('button.az.outlined.danger.background')};
+      background: ${options.dt('button.az.outlined.danger.background')};
     }
 
     .p-button-text:hover,
@@ -151,29 +151,29 @@ export default {
     }
 
     .p-button:disabled {
-      background-color: ${dt('button.az.primary.disabledBackground')};
-      border-color: ${dt('button.az.primary.disabledBorder')};
-      color: ${dt('button.az.primary.contrastColor')};
+      background-color: ${options.dt('button.az.primary.disabledBackground')};
+      border-color: ${options.dt('button.az.primary.disabledBorder')};
+      color: ${options.dt('button.az.primary.contrastColor')};
       opacity: 1;
     }
     .p-button-white-border:disabled {
-      border: ${dt('button.az.whiteBorder.border')};
+      border: ${options.dt('button.az.whiteBorder.border')};
     }
     .p-button-outlined:disabled {
-      border-color: ${dt('button.az.primary.disabledBorder')};
-      color: ${dt('button.az.primary.disabledColor')};
-      background-color: ${dt('button.az.outlined.primary.disabledBackground')};
+      border-color: ${options.dt('button.az.primary.disabledBorder')};
+      color: ${options.dt('button.az.primary.disabledColor')};
+      background-color: ${options.dt('button.az.outlined.primary.disabledBackground')};
     }
     .p-button-text:disabled {
-      color: ${dt('button.az.primary.disabledColor')};
+      color: ${options.dt('button.az.primary.disabledColor')};
       background-color: transparent;
       border: none;
       text-decoration: none;
     }
     .p-button-danger:disabled {
-      background-color: ${dt('button.az.danger.disabledBackground')};
-      color: ${dt('button.az.danger.disabledColor')};
-      border-color: ${dt('button.az.danger.disabledBorder')};
+      background-color: ${options.dt('button.az.danger.disabledBackground')};
+      color: ${options.dt('button.az.danger.disabledColor')};
+      border-color: ${options.dt('button.az.danger.disabledBorder')};
       opacity: 1;
     }
   `,
