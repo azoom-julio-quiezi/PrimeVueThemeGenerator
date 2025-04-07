@@ -8,7 +8,8 @@
   },
   "files": [
     "dist",
-    "assets"
+    "assets",
+    "components"
   ],
   "scripts": {
     "create": "ts-node src/cli.ts create --output ./test",
