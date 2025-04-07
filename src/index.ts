@@ -47,13 +47,11 @@ import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import { tokens } from './${path.basename(outputPath)}';
 import button from './button/button';
-import menubar from './menubar/menubar';
 
 const Default = definePreset(Aura, {
   ...tokens,
   components: {
     button,
-    menubar,
   },
 });
 
