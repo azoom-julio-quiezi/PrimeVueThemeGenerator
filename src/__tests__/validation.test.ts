@@ -129,7 +129,7 @@ describe('Token Validation', () => {
         } as TokenLeaf,
         'padding': {
           'x': {
-            '$type': 'spacing'
+            '$type': 'spacing' // Missing $value
           } as unknown as TokenLeaf
         }
       },
