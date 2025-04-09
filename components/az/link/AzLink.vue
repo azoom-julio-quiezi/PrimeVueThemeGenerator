@@ -61,9 +61,9 @@ defineProps({
   --p-az-link-primary-hover-color: var(--p-primary-color);
   --p-az-link-primary-active-color: var(--p-primary-active-color);
 
-  --p-az-link-secondary-color: var(--p-secondary-color);
-  --p-az-link-secondary-hover-color: var(--p-secondary-color);
-  --p-az-link-secondary-active-color: var(--p-secondary-active-color);
+  --p-az-link-secondary-color: var(--p-az-secondary-color);
+  --p-az-link-secondary-hover-color: var(--p-az-secondary-color);
+  --p-az-link-secondary-active-color: var(--p-az-secondary-color);
   
   --p-az-link-text-color: var(--p-text-color);
   --p-az-link-text-hover-color: var(--p-text-color);
@@ -81,7 +81,7 @@ defineProps({
   --p-az-link-visited-hover-color: var(--p-az-visited-950);
   --p-az-link-visited-active-color: var(--p-az-visited-200);
 
-  --p-az-link-primary-disabled-color: var(--p-primary-az-disabled-color);
+  --p-az-link-disabled-color: var(--p-az-disabled-color);
 }
 
 .p-link {
@@ -201,7 +201,7 @@ defineProps({
 }
 
 .p-link.p-disabled, .p-link.p-disabled .p-link-icon {
-  color: var(--p-az-link-primary-disabled-color);
+  color: var(--p-az-link-disabled-color);
   opacity: 1;
 }
 
