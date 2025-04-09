@@ -33,6 +33,7 @@ This creates:
 assets/
 ├── themes/      # Theme files
 └── styles/      # General styles
+components/      # Component files
 ```
 
 ### Convert Tokens
