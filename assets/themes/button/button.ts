@@ -20,7 +20,19 @@ export default {
     label: {
       fontWeight: '600',
     },
-    raisedShadow: '0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12)',
+    raised: {
+      boxShadow: '0px 3px 12px 0px rgba(0, 0, 0, 0.30), 0px 10px 30px 6px rgba(0, 0, 0, 0.10)',
+      border: '1px solid {surface.0}',
+      hover: {
+        boxShadow: '0px 1px 5px 0px rgba(0, 0, 0, 0.30), 0px 2px 8px 1px rgba(0, 0, 0, 0.10)',
+      },
+      active: {
+        boxShadow: 'none',
+      },
+      focus: {
+        boxShadow: '0px 3px 12px 0px rgba(0, 0, 0, 0.30), 0px 10px 30px 6px rgba(0, 0, 0, 0.10)',
+      },
+    },
     focusRing: {
       width: '1px', // change formfield focus ring width
       style: 'solid', // change formfield focus ring style
@@ -54,41 +66,10 @@ export default {
       whiteBorder: {
         border: '1px solid {surface.0}',
       },
-      float: {
-        boxShadow: '0px 3px 12px 0px rgba(0, 0, 0, 0.30), 0px 10px 30px 6px rgba(0, 0, 0, 0.10)',
-        border: '1px solid {surface.0}',
-      },
-      outlined: {
-        primary: {
-          disabledBackground: '{surface.0}',
-          background: '{surface.0}',
-        },
-        secondary: {
-          disabledBackground: '{surface.0}',
-          background: '{surface.0}',
-        },
-        danger: {
-          disabledBackground: '{surface.0}',
-          background: '{surface.0}',
-        },
-      },
-      primary: {
-        disabledBackground: '{primary.az.disabledColor}',
-        disabledBorder: '{primary.az.disabledColor}',
-        contrastColor: '{primary.contrastColor}',
-        disabledColor: '{primary.az.disabledColor}',
-      },
-      secondary: {
-        disabledBackground: '{az.secondary.disabledColor}',
-        disabledBorder: '{az.secondary.disabledColor}',
-        contrastColor: '{az.secondary.contrastColor}',
-        disabledColor: '{az.secondary.disabledColor}',
-      },
-      danger: {
-        disabledBackground: '{surface.0}',
-        disabledBorder: '{az.danger.200}',
-        contrastColor: '{az.danger.contrastColor}',
-        disabledColor: '{az.danger.200}',
+      disabled: {
+        background: '{az.disabled.background}',
+        border: '{az.disabled.border}',
+        color: '{az.disabled.color}',
       },
     },
   },
@@ -120,28 +101,28 @@ export default {
       border: ${options.dt('button.az.whiteBorder.border')};
     }
 
-    .p-button-float {
-      box-shadow: ${options.dt('button.az.float.boxShadow')};
-      border: ${options.dt('button.az.float.border')};
+    .p-button-raised {
+      box-shadow: ${options.dt('button.raised.boxShadow')};
+      border: ${options.dt('button.raised.border')};
     }
-    .p-button-float:hover {
-      box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.30), 0px 2px 8px 1px rgba(0, 0, 0, 0.10);
+    .p-button-raised:hover {
+      box-shadow: ${options.dt('button.raised.hover.boxShadow')};
     }
-    .p-button-float:active {
-      box-shadow: none;
+    .p-button-raised:focus {
+      box-shadow: ${options.dt('button.raised.focus.boxShadow')};
     }
-    .p-button-float:focus {
-      box-shadow: 0px 3px 12px 0px rgba(0, 0, 0, 0.30), 0px 10px 30px 6px rgba(0, 0, 0, 0.10);
+    .p-button-raised:active {
+      box-shadow: ${options.dt('button.raised.active.boxShadow')};
     }
     
     .p-button-outlined {
-      background: ${options.dt('button.az.outlined.primary.background')};
+      background: ${options.dt('button.outlined.primary.az.background')};
     }
     .p-button-outlined.p-button-secondary {
-      background: ${options.dt('button.az.outlined.secondary.background')};
+      background: ${options.dt('button.outlined.secondary.az.background')};
     }
     .p-button-outlined.p-button-danger {
-      background: ${options.dt('button.az.outlined.danger.background')};
+      background: ${options.dt('button.outlined.danger.background')};
     }
 
     .p-button-text:hover,
@@ -151,29 +132,29 @@ export default {
     }
 
     .p-button:disabled {
-      background-color: ${options.dt('button.az.primary.disabledBackground')};
-      border-color: ${options.dt('button.az.primary.disabledBorder')};
-      color: ${options.dt('button.az.primary.contrastColor')};
+      background-color: ${options.dt('button.az.disabled.background')};
+      border-color: ${options.dt('button.az.disabled.border')};
+      color: ${options.dt('button.az.disabled.color')};
       opacity: 1;
     }
     .p-button-white-border:disabled {
       border: ${options.dt('button.az.whiteBorder.border')};
     }
     .p-button-outlined:disabled {
-      border-color: ${options.dt('button.az.primary.disabledBorder')};
-      color: ${options.dt('button.az.primary.disabledColor')};
-      background-color: ${options.dt('button.az.outlined.primary.disabledBackground')};
+      border-color: ${options.dt('button.outlined.az.disabled.border')};
+      color: ${options.dt('button.outlined.az.disabled.color')};
+      background-color: ${options.dt('button.outlined.az.disabled.background')};
     }
     .p-button-text:disabled {
-      color: ${options.dt('button.az.primary.disabledColor')};
+      color: ${options.dt('button.text.az.disabled.color')};
       background-color: transparent;
       border: none;
       text-decoration: none;
     }
     .p-button-danger:disabled {
-      background-color: ${options.dt('button.az.danger.disabledBackground')};
-      color: ${options.dt('button.az.danger.disabledColor')};
-      border-color: ${options.dt('button.az.danger.disabledBorder')};
+      background-color: ${options.dt('button.danger.az.disabledBackground')};
+      color: ${options.dt('button.danger.az.disabledColor')};
+      border-color: ${options.dt('button.danger.az.disabledBorder')};
       opacity: 1;
     }
   `,
@@ -195,17 +176,17 @@ export default {
           },
         },
         secondary: {
-          background: '{secondary.color}',
-          hoverBackground: '{secondary.hover.color}',
-          activeBackground: '{secondary.active.color}',
-          borderColor: '{secondary.color}',
-          hoverBorderColor: '{secondary.hover.color}',
-          activeBorderColor: '{secondary.active.color}',
-          color: '{secondary.contrast.color}',
-          hoverColor: '{secondary.contrast.color}',
-          activeColor: '{secondary.contrast.color}',
+          background: '{az.secondary.color}',
+          hoverBackground: '{az.secondary.hover.color}',
+          activeBackground: '{az.secondary.active.color}',
+          borderColor: '{az.secondary.color}',
+          hoverBorderColor: '{az.secondary.hover.color}',
+          activeBorderColor: '{az.secondary.active.color}',
+          color: '{az.secondary.contrast.color}',
+          hoverColor: '{az.secondary.contrast.color}',
+          activeColor: '{az.secondary.contrast.color}',
           focusRing: {
-            color: '{secondary.color}',
+            color: '{az.secondary.color}',
           },
         },
         danger: {
@@ -221,6 +202,13 @@ export default {
           focusRing: {
               color: '{az.danger.color}',
               shadow: 'none'
+          },
+          extend: {
+            az: {
+              disabledBackground: '{surface.0}',
+              disabledBorder: '{az.danger.200}',
+              disabledColor: '{az.danger.200}',
+            }
           }
         },
       },
@@ -230,12 +218,172 @@ export default {
           activeBackground: '{primary.100}',
           borderColor: '{primary.color}',
           color: '{primary.color}',
+          extend: {
+            az: {
+              background: '{surface.0}',
+            }
+          }
         },
         secondary: {
-          hoverBackground: '{secondary.50}',
-          activeBackground: '{secondary.100}',
-          borderColor: '{secondary.color}',
-          color: '{secondary.color}',
+          hoverBackground: '{az.secondary.50}',
+          activeBackground: '{az.secondary.100}',
+          borderColor: '{az.secondary.color}',
+          color: '{az.secondary.color}',
+          extend: {
+            az: {
+              background: '{surface.0}',
+            }
+          }
+        },
+        danger: {
+          background: '{surface.0}',
+          hoverBackground: '{az.danger.50}',
+          activeBackground: '{az.danger.100}',
+          borderColor: '{az.danger.700}',
+          color: '{az.danger.700}',
+          hoverColor: '{surface.0}',
+          activeColor: '{surface.0}',
+          focusRing: {
+              color: '{az.danger.700}',
+              shadow: 'none'
+          }
+        },
+        extend: {
+          az: {
+            disabledBackground: '{surface.0}',
+            disabledBorderColor: '{az.disabled.border}',
+            disabledColor: '{az.disabled.color}',
+          }
+        }
+      },
+      text: {
+        primary: {
+          hoverBackground: '{primary.50}',
+          activeBackground: '{primary.100}',
+          color: '{primary.color}',
+        },
+        secondary: {
+          hoverBackground: '{az.secondary.50}',
+          activeBackground: '{az.secondary.100}',
+          color: '{az.secondary.color}',
+        },
+        danger: {
+          background: '{transparent}',
+          hoverBackground: '{az.danger.50}',
+          activeBackground: '{az.danger.100}',
+          borderColor: '{az.danger.700}',
+          hoverBorderColor: '{az.danger.700}',
+          activeBorderColor: '{az.danger.700}',
+          color: '{az.danger.700}',
+          hoverColor: '{surface.0}',
+          activeColor: '{surface.0}',
+          focusRing: {
+              color: '{az.danger.700}',
+              shadow: 'none'
+          }
+        },
+        extend: {
+          az: {
+            disabledColor: '{az.disabled.color}',
+          }
+        }
+      },
+    },
+    dark: {
+      root: {
+        primary: {
+          background: '{primary.color}',
+          hoverBackground: '{primary.hover.color}',
+          activeBackground: '{primary.active.color}',
+          borderColor: '{primary.color}',
+          hoverBorderColor: '{primary.hover.color}',
+          activeBorderColor: '{primary.active.color}',
+          color: '{primary.contrast.color}',
+          hoverColor: '{primary.contrast.color}',
+          activeColor: '{primary.contrast.color}',
+          focusRing: {
+            color: '{primary.900}',
+          },
+          extend: {
+            az: {
+              disabledBackground: '{primary.az.disabledColor}',
+              disabledBorder: '{primary.az.disabledColor}',
+              disabledColor: '{primary.az.disabledColor}',
+            }
+          }
+        },
+        secondary: {
+          background: '{az.secondary.color}',
+          hoverBackground: '{az.secondary.hover.color}',
+          activeBackground: '{az.secondary.active.color}',
+          borderColor: '{az.secondary.color}',
+          hoverBorderColor: '{az.secondary.hover.color}',
+          activeBorderColor: '{az.secondary.active.color}',
+          color: '{az.secondary.contrast.color}',
+          hoverColor: '{az.secondary.contrast.color}',
+          activeColor: '{az.secondary.contrast.color}',
+          focusRing: {
+            color: '{az.secondary.900}',
+          },
+          extend: {
+            az: {
+              disabledBackground: '{az.secondary.disabledColor}',
+              disabledBorder: '{az.secondary.disabledColor}',
+              disabledColor: '{az.secondary.disabledColor}',
+            }
+          }
+        },
+        danger: {
+          background: '{az.danger.50}',
+          hoverBackground: '{az.danger.800}',
+          activeBackground: '{az.danger.700}',
+          borderColor: '{az.danger.700}',
+          hoverBorderColor: '{az.danger.800}',
+          activeBorderColor: '{az.danger.700}',
+          color: '{az.danger.700}',
+          hoverColor: '{surface.0}',
+          activeColor: '{surface.0}',
+          focusRing: {
+              color: '{az.danger.color}',
+              shadow: 'none'
+          },
+          extend: {
+            az: {
+              disabledBackground: '{surface.0}',
+              disabledBorder: '{az.danger.200}',
+              disabledColor: '{az.danger.200}',
+            }
+          }
+        },
+      },
+      outlined: {
+        primary: {
+          hoverBackground: '{primary.50}',
+          activeBackground: '{primary.100}',
+          borderColor: '{primary.color}',
+          color: '{primary.color}',
+          extend: {
+            az: {
+              background: '{surface.0}',
+              disabledBackground: '{surface.0}',
+              disabledBorder: '{primary.az.disabledColor}',
+              disabledColor: '{primary.az.disabledColor}',
+            }
+          }
+        },
+        secondary: {
+          hoverBackground: '{az.secondary.50}',
+          activeBackground: '{az.secondary.100}',
+          borderColor: '{az.secondary.color}',
+          color: '{az.secondary.color}',
+          extend: {
+            az: {
+              background: '{surface.0}',
+              disabledBackground: '{surface.0}',
+              disabledBorder: '{az.secondary.disabledColor}',
+              disabledColor: '{az.secondary.disabledColor}',
+            }
+          }
         },
         danger: {
           background: '{surface.0}',
@@ -256,11 +404,21 @@ export default {
           hoverBackground: '{primary.50}',
           activeBackground: '{primary.100}',
           color: '{primary.color}',
+          extend: { 
+            az: {
+              disabledColor: '{primary.az.disabledColor}',
+            }
+          }
         },
         secondary: {
-          hoverBackground: '{secondary.50}',
-          activeBackground: '{secondary.100}',
-          color: '{secondary.color}',
+          hoverBackground: '{az.secondary.50}',
+          activeBackground: '{az.secondary.100}',
+          color: '{az.secondary.color}',
+          extend: {
+            az: {
+              disabledColor: '{az.secondary.disabledColor}',
+            }
+          }
         },
         danger: {
           background: '{transparent}',
@@ -276,64 +434,6 @@ export default {
               color: '{az.danger.700}',
               shadow: 'none'
           }
-        },
-      },
-    },
-    dark: {
-      root: {
-        primary: {
-          background: '{primary.color}',
-          hoverBackground: '{primary.hover.color}',
-          activeBackground: '{primary.active.color}',
-          borderColor: '{primary.color}',
-          hoverBorderColor: '{primary.hover.color}',
-          activeBorderColor: '{primary.active.color}',
-          color: '{primary.contrast.color}',
-          hoverColor: '{primary.contrast.color}',
-          activeColor: '{primary.contrast.color}',
-          focusRing: {
-            color: '{primary.900}',
-          },
-        },
-        secondary: {
-          background: '{secondary.color}',
-          hoverBackground: '{secondary.hover.color}',
-          activeBackground: '{secondary.active.color}',
-          borderColor: '{secondary.color}',
-          hoverBorderColor: '{secondary.hover.color}',
-          activeBorderColor: '{secondary.active.color}',
-          color: '{secondary.contrast.color}',
-          hoverColor: '{secondary.contrast.color}',
-          activeColor: '{secondary.contrast.color}',
-          focusRing: {
-            color: '{secondary.900}',
-          },
-        },
-      },
-      outlined: {
-        primary: {
-          hoverBackground: '{primary.50}',
-          activeBackground: '{primary.100}',
-          borderColor: '{primary.color}',
-          color: '{primary.color}',
-        },
-        secondary: {
-          hoverBackground: '{secondary.50}',
-          activeBackground: '{secondary.100}',
-          borderColor: '{secondary.color}',
-          color: '{secondary.color}',
-        },
-      },
-      text: {
-        primary: {
-          hoverBackground: '{primary.50}',
-          activeBackground: '{primary.100}',
-          color: '{primary.color}',
-        },
-        secondary: {
-          hoverBackground: '{secondary.50}',
-          activeBackground: '{secondary.100}',
-          color: '{secondary.color}',
         },
       },
     },
