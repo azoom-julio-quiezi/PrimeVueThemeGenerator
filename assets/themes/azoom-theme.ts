@@ -297,21 +297,62 @@ const Default = definePreset(Aura, {
       800: '#292524',
       900: '#1c1917',
       950: '#0c0a09'
+    },
+    az: {
+      brand: {
+        50: '#fafafa',
+        100: '#f5f5f5',
+        200: '#e5e5e5',
+        300: '#d4d4d4',
+        400: '#a1a1aa',
+        500: '#737373',
+        600: '#525252',
+        700: '#404040',
+        800: '#262626',
+        900: '#171717',
+        950: '#0a0a0a'
+      },
+      brandAccent: {
+        50: '#fafafa',
+        100: '#f5f5f5',
+        200: '#e5e5e5',
+        300: '#d4d4d4',
+        400: '#a1a1aa',
+        500: '#737373',
+        600: '#525252',
+        700: '#404040',
+        800: '#262626',
+        900: '#171717',
+        950: '#0a0a0a'
+      }
     }
   },
   semantic: {
     primary: {
-      50: '{emerald.50}',
-      100: '{emerald.100}',
-      200: '{emerald.200}',
-      300: '{emerald.300}',
-      400: '{emerald.400}',
-      500: '{emerald.500}',
-      600: '{emerald.600}',
-      700: '{emerald.700}',
-      800: '{emerald.800}',
-      900: '{emerald.900}',
-      950: '{emerald.950}'
+      50: '{brandq.50}',
+      100: '{brand.100}',
+      200: '{brand.200}',
+      300: '{brand.300}',
+      400: '{brand.400}',
+      500: '{brand.500}',
+      600: '{brand.600}',
+      700: '{brand.700}',
+      800: '{brand.800}',
+      900: '{brand.900}',
+      950: '{brand.950}'
+    },
+    secondary: {
+      50: '{brandAccent.50}',
+      100: '{brandAccent.100}',
+      200: '{brandAccent.200}',
+      300: '{brandAccent.300}',
+      400: '{brandAccent.400}',
+      500: '{brandAccent.500}',
+      600: '{brandAccent.600}',
+      700: '{brandAccent.700}',
+      800: '{brandAccent.800}',
+      900: '{brandAccent.900}',
+      950: '{brandAccent.950}'
     },
     anchorGutter: '2px',
     iconSize: '1rem',
@@ -414,17 +455,17 @@ const Default = definePreset(Aura, {
       light: {
         surface: {
           0: '#ffffff',
-          50: '{slate.50}',
-          100: '{slate.100}',
-          200: '{slate.200}',
-          300: '{slate.300}',
-          400: '{slate.400}',
-          500: '{slate.500}',
-          600: '{slate.600}',
-          700: '{slate.700}',
-          800: '{slate.800}',
-          900: '{slate.900}',
-          950: '{slate.950}'
+          50: '{neutral.50}',
+          100: '{neutral.100}',
+          200: '{neutral.200}',
+          300: '{neutral.300}',
+          400: '{neutral.400}',
+          500: '{neutral.500}',
+          600: '{neutral.600}',
+          700: '{neutral.700}',
+          800: '{neutral.800}',
+          900: '{neutral.900}',
+          950: '{neutral.950}'
         },
         primary: {
           color: '{primary.500}',
@@ -539,23 +580,37 @@ const Default = definePreset(Aura, {
       dark: {
         surface: {
           0: '#ffffff',
-          50: '{zinc.50}',
-          100: '{zinc.100}',
-          200: '{zinc.200}',
-          300: '{zinc.300}',
-          400: '{zinc.400}',
-          500: '{zinc.500}',
-          600: '{zinc.600}',
-          700: '{zinc.700}',
-          800: '{zinc.800}',
-          900: '{zinc.900}',
-          950: '{zinc.950}'
+          50: '{neutral.50}',
+          100: '{neutral.100}',
+          200: '{neutral.200}',
+          300: '{neutral.300}',
+          400: '{neutral.400}',
+          500: '{neutral.500}',
+          600: '{neutral.600}',
+          700: '{neutral.700}',
+          800: '{neutral.800}',
+          900: '{neutral.900}',
+          950: '{neutral.950}'
         },
         primary: {
-          color: '{primary.400}',
-          contrastColor: '{surface.900}',
-          hoverColor: '{primary.300}',
-          activeColor: '{primary.200}'
+          color: '{primary.700}',
+          contrastColor: '{surface.0}',
+          hoverColor: '{primary.500}',
+          activeColor: '{primary.400}',
+          az: {
+            disabledColor: '{surface.300}'
+          }
+        },
+        az: {
+          secondary: {
+            color: '{az.secondary.700}',
+            contrastColor: '{surface.0}',
+            hoverColor: '{az.secondary.500}',
+            activeColor: '{az.secondary.400}',
+            az: {
+              disabledColor: '{surface.300}',
+            }
+          },
         },
         highlight: {
           background: '{primary.400}',
