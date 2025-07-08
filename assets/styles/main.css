@@ -3,12 +3,103 @@
 
 :root {
 	--body-bg: var(--p-surface-50);
+
+	/* Typography Base Unit */
+	--rem-base: 14px;
+
+	/* Font Family */
+	--font-family-base: 'Noto Sans JP', sans-serif;
+
+	/* OpenType Features */
+	--font-feature-halt: 'halt' 1;
+
+	/* Font Weight */
+	--font-weight-normal: 400;
+	--font-weight-medium: 500;
+
+	/* Font Sizes (Scale) */
+	--text-xs:   calc(var(--rem-base) * 0.75);    /* 10.5px */
+	--text-sm:   calc(var(--rem-base) * 0.875);   /* 12.25px */
+	--text-base: var(--rem-base);                 /* 14px */
+	--text-md:   calc(var(--rem-base) * 1.25);    /* 17.5px */
+	--text-lg:   calc(var(--rem-base) * 1.5);     /* 21px */
+	--text-xl:   calc(var(--rem-base) * 1.75);    /* 24.5px */
+	--text-2xl:  calc(var(--rem-base) * 2);       /* 28px */
+
+	/* Role-based Font Assignments */
+	--font-body:             var(--text-base);
+	--font-heading-large:    var(--text-2xl);
+	--font-heading-medium:   var(--text-xl);
+	--font-heading-small:    var(--text-lg);
+	--font-p:                var(--text-base);
+	--font-caption:          var(--text-xs);
+
+	--breakpoint-sm: calc(var(--rem-base) * 25.75); /* 360.5px */
+	--breakpoint-md: calc(var(--rem-base) * 55);   /* 770px */
+	--breakpoint-lg: calc(var(--rem-base) * 73);   /* 1022px */
+	--breakpoint-xl: calc(var(--rem-base) * 103);   /* 1442px */
 }
 
 :root[class="p-dark"] {
 	--body-bg: var(--p-surface-950);
 }
 
+html {
+  font-size: 14px; /* 1rem = 14px */
+}
+
 body {
 	background-color: var(--body-bg);
+	font-family: var(--font-family-base);
+  font-feature-settings: var(--font-feature-halt);
+  font-size: var(--font-body);
+  font-weight: var(--font-weight-normal);
+  line-height: normal;
+  letter-spacing: 0;
+}
+
+/* Typography for Headings */
+heading-large {
+  font-size: var(--font-h1);
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  letter-spacing: 0;
+}
+
+heading-medium {
+  font-size: var(--font-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  letter-spacing: 0;
+}
+
+heading-small {
+  font-size: var(--font-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  letter-spacing: 0;
+}
+
+/* Paragraph */
+p {
+  font-size: var(--font-p);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+
+/* Caption or <small> */
+small {
+  font-size: var(--font-caption);
+  line-height: normal;
+  letter-spacing: 0;
+}
+
+/* Responsive Typography Adjustments */
+@media (max-width: 768px) {
+  :root {
+    --font-heading-large : var(--text-xl);   /* 24.5px */
+    --font-heading-medium: var(--text-lg);   /* 21px */
+    --font-heading-small : var(--text-md);   /* 17.5px */
+  }
 }
