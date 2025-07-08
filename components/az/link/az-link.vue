@@ -193,34 +193,6 @@ const useHtmlAnchor = computed(() => {
 </script>
 
 <style>
-:root {
-  --p-az-link-primary-color: var(--p-primary-color);
-  --p-az-link-primary-hover-color: var(--p-primary-color);
-  --p-az-link-primary-active-color: var(--p-primary-active-color);
-
-  --p-az-link-secondary-color: var(--p-az-secondary-color);
-  --p-az-link-secondary-hover-color: var(--p-az-secondary-color);
-  --p-az-link-secondary-active-color: var(--p-az-secondary-color);
-
-  --p-az-link-text-color: var(--p-text-color);
-  --p-az-link-text-hover-color: var(--p-text-color);
-  --p-az-link-text-active-color: var(--p-surface-400);
-
-  --p-az-link-unvisited-color: var(--p-blue-600);
-  --p-az-link-unvisited-hover-color: var(--p-blue-600);
-  --p-az-link-unvisited-active-color: var(--p-blue-200);
-
-  --p-az-link-visited-color: var(--p-fuchsia-950);
-  --p-az-link-visited-hover-color: var(--p-fuchsia-950);
-  --p-az-link-visited-active-color: var(--p-fuchsia-200);
-
-  --p-az-link-white-color: #ffffff;
-  --p-az-link-white-hover-color: #ffffff;
-  --p-az-link-white-active-color: #ffffff;
-
-  --p-az-link-disabled-color: var(--p-az-disabled-color);
-}
-
 .p-link {
   font-size: 1rem;
   font-weight: 400;
@@ -237,104 +209,46 @@ const useHtmlAnchor = computed(() => {
 .p-link:focus-visible {
   outline-offset: 4px;
   border-radius: 4px;
+  outline: 1px solid var(--p-primary-color);
 }
 
 .p-az-link-primary {
-  color: var(--p-az-link-primary-color);
-}
-.p-az-link-primary:hover {
-  color: var(--p-az-link-primary-hover-color);
-}
-.p-az-link-primary:active {
-  color: var(--p-az-link-primary-active-color);
-}
-.p-az-link-primary:focus-visible {
-  outline: 1px solid var(--p-az-link-primary-color);
-}
-
-.p-az-link-secondary {
-  color: var(--p-az-link-secondary-color);
-}
-.p-az-link-secondary:hover {
-  color: var(--p-az-link-secondary-hover-color);
-}
-.p-az-link-secondary:active {
-  color: var(--p-az-link-secondary-active-color);
-}
-.p-az-link-secondary:focus-visible {
-  outline: 1px solid var(--p-az-link-secondary-color);
+  color: var(--p-primary-color);
 }
 
 .p-az-link-text {
-  color: var(--p-az-link-text-color);
-}
-.p-az-link-text:hover {
-  color: var(--p-az-link-text-hover-color);
-}
-.p-az-link-text:active {
-  color: var(--p-az-link-text-active-color);
+  color: var(--p-text-color);
 }
 .p-az-link-text:focus-visible {
-  color: var(--p-az-link-text-color);
-  outline: 1px solid var(--p-az-link-text-color);
+  outline: 1px solid var(--p-text-color);
 }
 
 .p-az-link-traditional {
-  color: var(--p-az-link-unvisited-color);
-}
-.p-az-link-traditional:hover {
-  color: var(--p-az-link-unvisited-hover-color);
-}
-.p-az-link-traditional:active {
-  color: var(--p-az-link-unvisited-active-color);
+  color: var(--p-blue-600);
 }
 .p-az-link-traditional:focus-visible {
-  color: var(--p-az-link-unvisited-color);
-  outline: 1px solid var(--p-az-link-unvisited-color);
+  outline: 1px solid var(--p-blue-600);
 }
 
 .p-az-link-traditional:visited {
-  color: var(--p-az-link-visited-color);
-}
-.p-az-link-traditional:visited:hover {
-  color: var(--p-az-link-visited-hover-color);
-}
-.p-az-link-traditional:visited:active {
-  color: var(--p-az-link-visited-active-color);
+  color: var(--p-fuchsia-950);
 }
 .p-az-link-traditional:visited:focus-visible {
-  color: var(--p-az-link-visited-color);
-  outline: 1px solid var(--p-az-link-visited-color);
+  outline: 1px solid var(--p-fuchsia-950);
 }
 
 .p-az-link-traditional:visited .p-link-icon {
-  color: var(--p-az-link-visited-color);
-}
-.p-az-link-traditional:visited:hover .p-link-icon {
-  color: var(--p-az-link-visited-hover-color);
-}
-.p-az-link-traditional:visited:active .p-link-icon {
-  color: var(--p-az-link-visited-active-color);
-}
-.p-az-link-traditional:visited:focus-visible .p-link-icon {
-  color: var(--p-az-link-visited-color);
-  outline: 1px solid var(--p-az-link-visited-color);
+  color: var(--p-fuchsia-950);
 }
 
 .p-az-link-white {
-  color: var(--p-az-link-white-color);
-}
-.p-az-link-white:hover {
-  color: var(--p-az-link-white-hover-color);
-  border-bottom: 2px solid #ffffff;
+  color: #ffffff;
 }
 .p-az-link-white:focus-visible {
-  color: var(--p-az-link-white-color);
   outline: 1px solid #ffffff;
 }
 
-.p-link.p-disabled,
-.p-link.p-disabled .p-link-icon {
+.p-link.p-disabled {
   opacity: var(--p-disabled-opacity);
 }
 
