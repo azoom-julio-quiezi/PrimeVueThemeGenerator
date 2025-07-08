@@ -14,7 +14,7 @@ A tool that converts Figma Design Tokens to PrimeVue themes and provides custom 
 ## 📦 Installation
 
 ```bash
-npm install git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
+pnpm add git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
 
 ## 🛠️ Usage
@@ -25,10 +25,10 @@ Start by creating the base theme structure in your project:
 
 ```bash
 # Create base theme structure in current directory
-npx primevue-theme create
+pnpm exec primevue-theme create
 
 # Or specify a custom output directory
-npx primevue-theme create -o ./src/themes
+pnpm exec primevue-theme create -o ./src/themes
 ```
 
 This creates the following structure:
@@ -53,13 +53,13 @@ Convert your Figma Design Tokens to PrimeVue theme tokens:
 
 ```bash
 # Convert tokens using default paths
-npx primevue-theme convert-tokens -i ./tokens/tokens.json
+pnpm exec primevue-theme convert-tokens -i ./tokens/tokens.json
 
 # Specify custom output path
-npx primevue-theme convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
+pnpm exec primevue-theme convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
 
 # Force overwrite existing file
-npx primevue-theme convert-tokens -i ./tokens/tokens.json -f
+pnpm exec primevue-theme convert-tokens -i ./tokens/tokens.json -f
 ```
 
 **Default Output:** By default, the generated file will be saved as `theme-tokens.ts` in the `./themes/` directory. The `themes/` directory will be created automatically if it doesn't exist.
@@ -167,35 +167,35 @@ import AzLink from '@/components/az/link/AzLink.vue';
 git clone https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 
 # Install dependencies
-npm install
+pnpm install
 
 # Create test theme structure
-npm run create
+pnpm run create
 
 # Convert tokens (outputs to test directory)
-npm run convert-tokens
+pnpm run convert-tokens
 
 # Run tests
-npm test
+pnpm test
 
 # Watch mode for development
-npm run test:watch
+pnpm run test:watch
 
 # Build for production
-npm run build
+pnpm run build
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run tests in watch mode
-npm run test:watch
+pnpm run test:watch
 
 # Run specific test file
-npm test -- processors.test.ts
+pnpm test -- processors.test.ts
 ```
 
 ## 📋 Token Structure
