@@ -43,8 +43,10 @@ assets/
     └── reset.css
 components/          # Custom design system components
 └── az/
+    ├── label/
+    │   └── az-label.vue
     └── link/
-        └── AzLink.vue
+        └── az-link.vue
 ```
 
 ### 2. Convert Figma Tokens
@@ -115,26 +117,215 @@ app.mount('#app');
 
 ### Available Components
 
-#### AzLink Component
-A custom link component with enhanced styling and accessibility features:
+#### azLabel Component
+A flexible label component with support for different variants, sizes, and required field indicators:
+
+- **Multiple Variants**: Text-based and star-based required field indicators
+- **Size Options**: Small (sm) and large (lg) font sizes
+- **Custom Colors**: Support for custom color overrides
+- **Accessibility**: Proper `for` attribute linking to form controls
+- **Required Indicators**: Built-in support for required field marking
+- **Responsive Design**: Clean, modern styling with proper spacing
 
 ```vue
 <template>
-  <AzLink href="/about" variant="primary" size="medium">
-    About Us
-  </AzLink>
+  <!-- Basic label -->
+  <az-label 
+    label="Email Address"
+    html-for="email">
+  </az-label>
+
+  <!-- Required field with text indicator -->
+  <az-label 
+    label="Full Name"
+    html-for="name"
+    variant="text">
+  </az-label>
+
+  <!-- Required field with star indicator -->
+  <az-label 
+    label="Phone Number"
+    html-for="phone"
+    variant="star">
+  </az-label>
+
+  <!-- Custom styling -->
+  <az-label 
+    label="Custom Label"
+    html-for="custom"
+    size="lg"
+    color="#3b82f6">
+  </az-label>
+
+  <!-- Accessible label with ARIA -->
+  <az-label 
+    label="Username"
+    html-for="username"
+    aria-label="Enter your username"
+    aria-describedby="username-help"
+    aria-required="true">
+  </az-label>
+
+  <!-- Label with tooltip -->
+  <az-label 
+    label="Password"
+    html-for="password"
+    title="Must be at least 8 characters long"
+    variant="star">
+  </az-label>
 </template>
 
 <script setup>
-import AzLink from '@/components/az/link/AzLink.vue';
+import AzLabel from '@/components/az/label/az-label.vue';
 </script>
 ```
 
 **Props:**
+
+**Core Properties:**
+- `label`: Label text content (required)
+- `htmlFor`: ID of the form control to associate with (optional)
+
+**Styling & Variants:**
+- `variant`: 'text' | 'star' - Type of required field indicator (optional)
+- `color`: Custom color override (optional)
+- `size`: 'sm' | 'lg' - Font size variant (optional)
+
+**HTML Attributes:**
+- `id`: Unique identifier for the label element (optional)
+- `title`: Tooltip text that appears on hover (optional)
+
+**Accessibility (ARIA) Properties:**
+- `ariaLabel`: Alternative text for screen readers (optional)
+- `ariaDescribedby`: References element that describes the label (optional)
+- `ariaRequired`: Indicates if the associated form control is required (optional)
+
+#### AzLink Component
+A comprehensive link component that intelligently chooses between internal navigation (`nuxt-link`) and HTML anchor (`<a>` tag) based on the required functionality:
+
+- **Smart Element Selection**: Automatically uses `nuxt-link` for pure internal navigation and `<a>` tag when HTML-specific features are needed
+- **Multiple Variants**: Primary, secondary, text, traditional, and white color schemes
+- **Size Options**: Extra small (xsm), small (sm), large (lg), and extra large (xlg)
+- **Accessibility**: Proper focus states, keyboard navigation, and ARIA attributes
+- **Icon Support**: Built-in external link icon with customizable visibility
+- **State Management**: Hover, active, and disabled states
+- **Traditional Links**: Special handling for visited/unvisited link states
+- **Performance**: Prefetching controls for optimal loading
+- **Security**: Automatic security attributes for external links
+- **File Downloads**: Support for download links with custom filenames (works for both internal and external files)
+- **Internationalization**: Language specification for multilingual sites
+- **Analytics Integration**: Built-in support for link tracking and referrer control
+
+```vue
+<template>
+  <!-- Internal navigation - uses nuxt-link -->
+  <az-link 
+    label="About Us"
+    href="/about" 
+    variant="primary" 
+    size="lg"
+    :showDefaultIcon="true">
+  </az-link>
+
+  <!-- External link - uses <a> tag -->
+  <az-link 
+    label="Visit GitHub"
+    href="https://github.com" 
+    :external="true"
+    variant="traditional">
+  </az-link>
+
+  <!-- Internal download - uses <a> tag (not external but needs download) -->
+  <az-link 
+    label="Download PDF"
+    href="/files/document.pdf" 
+    download="my-document.pdf"
+    type="application/pdf">
+  </az-link>
+
+  <!-- Internal link with analytics - uses <a> tag -->
+  <az-link 
+    label="Contact"
+    href="/contact" 
+    ping="/analytics/track"
+    referrerpolicy="no-referrer">
+  </az-link>
+
+  <!-- International link - uses <a> tag -->
+  <az-link 
+    label="Sobre Nosotros"
+    href="/es/about" 
+    hreflang="es">
+  </az-link>
+
+  <!-- Link with tooltip and accessibility -->
+  <az-link 
+    label="Download Manual"
+    href="/files/manual.pdf"
+    :download="true"
+    title="Download the complete user manual"
+    aria-label="Download the complete user manual in PDF format"
+    aria-describedby="manual-description">
+  </az-link>
+
+  <!-- Accessible external link -->
+  <az-link 
+    label="Visit Documentation"
+    href="https://docs.example.com"
+    :external="true"
+    aria-label="Visit external documentation (opens in new tab)">
+  </az-link>
+</template>
+
+<script setup>
+import AzLink from '@/components/az/link/az-link.vue';
+</script>
+```
+
+**Props:**
+
+**Core Properties:**
+- `label`: Link text content
 - `href`: Link destination
-- `variant`: 'primary' | 'secondary' | 'tertiary'
-- `size`: 'small' | 'medium' | 'large'
+- `external`: Boolean to open link in new page/tab (default: false)
+
+**Styling & Variants:**
+- `semanticColor`: 'primary' | 'secondary' | 'text' | 'traditional' | 'white'
+- `variant`: 'primary' | 'secondary' | 'text' | 'traditional' | 'white'
+- `size`: 'xsm' | 'sm' | 'lg' | 'xlg'
 - `disabled`: Boolean for disabled state
+- `showDefaultIcon`: Boolean to show/hide the default external link icon
+
+**Element Selection Logic:**
+The component automatically chooses between `nuxt-link` and HTML `<a>` tag based on the following conditions:
+- Uses `<a>` tag if: any HTML-specific property is provided
+- Uses `nuxt-link` if: No HTML-specific properties are needed (pure internal navigation)
+
+**Nuxt-Link Properties (Internal Navigation):**
+- `replace`: Boolean to replace current history entry instead of adding new one
+- `activeClass`: CSS class applied when link is active
+- `exactActiveClass`: CSS class applied when link is exactly active
+- `ariaCurrent`: Accessibility attribute for active links ('page', 'step', 'location')
+- `prefetch`: Boolean to control prefetching behavior
+- `noPrefetch`: Boolean to disable prefetching
+- `prefetchOnHover`: Boolean to prefetch only on hover
+
+**HTML Anchor Properties (Triggers <a> tag usage):**
+- `download`: String | Boolean for file downloads (true = original filename, string = custom filename)
+- `hreflang`: String for language specification (e.g., 'en', 'es', 'fr')
+- `ping`: String for analytics tracking URLs
+- `referrerpolicy`: String for referrer control ('no-referrer', 'origin', etc.)
+- `type`: String for MIME type specification (e.g., 'application/pdf')
+
+**HTML Attributes:**
+- `id`: Unique identifier for the link element (optional)
+- `title`: Tooltip text that appears on hover (optional)
+
+**Accessibility (ARIA) Properties:**
+- `ariaLabel`: Alternative text for screen readers (optional)
+- `ariaDescribedby`: References element that describes the link (optional)
+
+**Note:** When any HTML-specific property is provided, the component automatically uses an `<a>` tag instead of `nuxt-link`, even for internal URLs. This enables features like internal file downloads, analytics tracking, and language specification for internal pages.
 
 ## 🔧 Development
 
