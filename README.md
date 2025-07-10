@@ -17,6 +17,23 @@ A tool that converts Figma Design Tokens to PrimeVue themes and provides custom 
 pnpm add git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
 
+### Dependencies
+
+This package has the following peer dependencies that must be installed in your Nuxt project:
+
+```bash
+# Required peer dependencies
+pnpm add vue primevue @azoom/az-icons nuxt@^3.0.0
+```
+
+**Peer Dependencies:**
+- `vue` (^3.0.0) - Vue 3 framework
+- `primevue` (^3.0.0) - PrimeVue component library
+- `@azoom/az-icons` (^1.0.0) - Icon library used by components
+- `nuxt` (^3.0.0) - Nuxt 3 framework
+
+**Note:** These are declared as peer dependencies to avoid version conflicts and bundle bloat. Your Nuxt project should install these dependencies directly.
+
 ## 🛠️ Usage
 
 ### 1. Create Theme Structure
@@ -36,8 +53,10 @@ This creates the following structure:
 assets/
 ├── themes/          # Theme configuration files
 │   ├── azoom-theme.ts
-│   └── button/
-│       └── button.ts
+│   ├── button/
+│   │   └── button.ts
+│   └── inputnumber/
+│       └── inputnumber.ts
 └── styles/          # Global styles
     ├── main.css
     └── reset.css
@@ -45,8 +64,18 @@ components/          # Custom design system components
 └── az/
     ├── label/
     │   └── az-label.vue
-    └── link/
-        └── az-link.vue
+    ├── link/
+    │   └── az-link.vue
+    ├── dialog/
+    │   └── az-dialog.vue
+    ├── confirmDialog/
+    │   └── az-confirm-dialog.vue
+    └── breadcrumb/
+        └── az-breadcrumb.vue
+composables/         # Vue composables
+└── use-az-confirm-dialog.ts
+plugins/            # Nuxt plugins
+└── confirmation.client.ts
 ```
 
 ### 2. Convert Figma Tokens
@@ -95,237 +124,315 @@ export default {
 
 **Important:** The generated `theme-tokens.ts` file contains your converted Figma tokens. You must import it and spread it (`...tokens`) inside the `definePreset` function to apply your design tokens to the PrimeVue theme.
 
-### 4. Import PrimeVue in Your App
+### 4. Import PrimeVue in Your Nuxt App
 
 ```typescript
-// main.ts
-import { createApp } from 'vue';
-import PrimeVue from 'primevue/config';
-import App from './App.vue';
-import theme from './themes/main-theme';
-
-const app = createApp(App);
-
-app.use(PrimeVue, {
-  theme: theme,
-});
-
-app.mount('#app');
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: [
+    'primevue/nuxt'
+  ],
+  primevue: {
+    theme: 'aura',
+    components: {}
+  }
+})
 ```
 
 ## 🎨 Custom Components
 
-### Available Components
+Our design system includes several custom components that enhance PrimeVue with additional functionality and consistent styling:
 
-#### azLabel Component
-A flexible label component with support for different variants, sizes, and required field indicators:
+### Component Overview
 
-- **Multiple Variants**: Text-based and star-based required field indicators
-- **Size Options**: Small (sm) and large (lg) font sizes
-- **Custom Colors**: Support for custom color overrides
-- **Accessibility**: Proper `for` attribute linking to form controls
-- **Required Indicators**: Built-in support for required field marking
-- **Responsive Design**: Clean, modern styling with proper spacing
+| Component | Description | Key Features |
+|-----------|-------------|--------------|
+| **AzLabel** | Form label with required indicators | Multiple variants, sizes, accessibility |
+| **AzLink** | Smart link component | Auto-detects internal/external, multiple variants |
+| **AzDialog** | Enhanced dialog with custom close | Japanese close button, dark mode support |
+| **AzConfirmDialog** | Custom confirm dialog | Japanese close button, icon support, dark mode |
+| **AzBreadcrumb** | Navigation breadcrumb | AzIcon home, custom separators, dark mode |
+| **InputNumber** | Customized number input | Right-aligned text for better readability |
+
+### Quick Examples
 
 ```vue
 <template>
-  <!-- Basic label -->
-  <az-label 
-    label="Email Address"
-    html-for="email">
-  </az-label>
+  <!-- AzLabel with required indicator -->
+  <az-label label="Email" html-for="email" required variant="text" />
+  <input id="email" type="email" />
 
-  <!-- Required field with text indicator -->
-  <az-label 
-    label="Full Name"
-    html-for="name"
-    variant="text">
-  </az-label>
+  <!-- AzLink with smart element detection -->
+  <az-link label="About Us" href="/about" variant="primary" />
+  <az-link label="External" href="https://example.com" :external="true" />
 
-  <!-- Required field with star indicator -->
-  <az-label 
-    label="Phone Number"
-    html-for="phone"
-    variant="star">
-  </az-label>
+  <!-- AzDialog with custom close button -->
+  <az-dialog v-model:visible="dialogVisible" header="Dialog Title">
+    <p>Content here</p>
+  </az-dialog>
 
-  <!-- Custom styling -->
-  <az-label 
-    label="Custom Label"
-    html-for="custom"
-    size="lg"
-    color="#3b82f6">
-  </az-label>
-
-  <!-- Accessible label with ARIA -->
-  <az-label 
-    label="Username"
-    html-for="username"
-    aria-label="Enter your username"
-    aria-describedby="username-help"
-    aria-required="true">
-  </az-label>
-
-  <!-- Label with tooltip -->
-  <az-label 
-    label="Password"
-    html-for="password"
-    title="Must be at least 8 characters long"
-    variant="star">
-  </az-label>
+  <!-- AzConfirmDialog with custom styling -->
+  <az-confirm-dialog group="custom" />
 </template>
 
 <script setup>
-import AzLabel from '@/components/az/label/az-label.vue';
+import AzLabel from '@azoom/primevue-theme-generator/components/az/label/az-label.vue';
+import AzLink from '@azoom/primevue-theme-generator/components/az/link/az-link.vue';
+import AzDialog from '@azoom/primevue-theme-generator/components/az/dialog/az-dialog.vue';
+import AzConfirmDialog from '@azoom/primevue-theme-generator/components/az/confirmDialog/az-confirm-dialog.vue';
 </script>
 ```
 
-**Props:**
+### Component Details
 
-**Core Properties:**
-- `label`: Label text content (required)
-- `htmlFor`: ID of the form control to associate with (optional)
+#### AzLabel Component
+Form label with built-in required field indicators and accessibility features.
 
-**Styling & Variants:**
-- `variant`: 'text' | 'star' - Type of required field indicator (optional)
-- `color`: Custom color override (optional)
-- `size`: 'sm' | 'lg' - Font size variant (optional)
+**Key Props:**
+- `label` (required): Label text
+- `htmlFor`: Form control ID
+- `required`: Show required indicator
+- `variant`: 'text' | 'star' (default: 'star')
+- `size`: 'sm' | 'md' | 'lg' (default: 'md')
 
-**HTML Attributes:**
-- `id`: Unique identifier for the label element (optional)
-- `title`: Tooltip text that appears on hover (optional)
-
-**Accessibility (ARIA) Properties:**
-- `ariaLabel`: Alternative text for screen readers (optional)
-- `ariaDescribedby`: References element that describes the label (optional)
-- `ariaRequired`: Indicates if the associated form control is required (optional)
+**Features:**
+- Japanese "必須" text or star (*) indicators
+- Multiple size variants
+- Full accessibility support
+- Custom color overrides
 
 #### AzLink Component
-A comprehensive link component that intelligently chooses between internal navigation (`nuxt-link`) and HTML anchor (`<a>` tag) based on the required functionality:
+Smart link component that automatically chooses between `nuxt-link` and `<a>` tag.
 
-- **Smart Element Selection**: Automatically uses `nuxt-link` for pure internal navigation and `<a>` tag when HTML-specific features are needed
-- **Multiple Variants**: Primary, secondary, text, traditional, and white color schemes
-- **Size Options**: Extra small (xsm), small (sm), large (lg), and extra large (xlg)
-- **Accessibility**: Proper focus states, keyboard navigation, and ARIA attributes
-- **Icon Support**: Built-in external link icon with customizable visibility
-- **State Management**: Hover, active, and disabled states
-- **Traditional Links**: Special handling for visited/unvisited link states
-- **Performance**: Prefetching controls for optimal loading
-- **Security**: Automatic security attributes for external links
-- **File Downloads**: Support for download links with custom filenames (works for both internal and external files)
-- **Internationalization**: Language specification for multilingual sites
-- **Analytics Integration**: Built-in support for link tracking and referrer control
+**Key Props:**
+- `label`: Link text
+- `href`: Link destination
+- `external`: Open in new tab
+- `variant`: 'primary' | 'secondary' | 'text' | 'traditional' | 'white'
+- `size`: 'xsm' | 'sm' | 'lg' | 'xlg'
 
+**Smart Features:**
+- Auto-detects internal vs external links
+- Supports file downloads and analytics
+- Built-in external link icon
+- Prefetching controls for performance
+
+#### AzDialog Component
+Enhanced dialog with custom Japanese close button and full PrimeVue integration.
+
+**Key Props:**
+- `visible`: Control dialog visibility (v-model support)
+- All PrimeVue Dialog props supported
+
+**Features:**
+- Custom "閉じる" close button with icon
+- Dark mode support
+- Full slot passthrough
+- Enhanced hover effects
+
+#### AzConfirmDialog Component
+Custom confirm dialog with Japanese close button, icon support, and enhanced styling.
+
+**Required Plugin for ConfirmDialog Component**
+     - `plugins/confirmation.client.ts`
+     - [PrimeVue ConfirmationService](https://primevue.org/confirmdialog/#confirmation-service)
+
+**Basic Setup:**
 ```vue
 <template>
-  <!-- Internal navigation - uses nuxt-link -->
-  <az-link 
-    label="About Us"
-    href="/about" 
-    variant="primary" 
-    size="lg"
-    :showDefaultIcon="true">
-  </az-link>
-
-  <!-- External link - uses <a> tag -->
-  <az-link 
-    label="Visit GitHub"
-    href="https://github.com" 
-    :external="true"
-    variant="traditional">
-  </az-link>
-
-  <!-- Internal download - uses <a> tag (not external but needs download) -->
-  <az-link 
-    label="Download PDF"
-    href="/files/document.pdf" 
-    download="my-document.pdf"
-    type="application/pdf">
-  </az-link>
-
-  <!-- Internal link with analytics - uses <a> tag -->
-  <az-link 
-    label="Contact"
-    href="/contact" 
-    ping="/analytics/track"
-    referrerpolicy="no-referrer">
-  </az-link>
-
-  <!-- International link - uses <a> tag -->
-  <az-link 
-    label="Sobre Nosotros"
-    href="/es/about" 
-    hreflang="es">
-  </az-link>
-
-  <!-- Link with tooltip and accessibility -->
-  <az-link 
-    label="Download Manual"
-    href="/files/manual.pdf"
-    :download="true"
-    title="Download the complete user manual"
-    aria-label="Download the complete user manual in PDF format"
-    aria-describedby="manual-description">
-  </az-link>
-
-  <!-- Accessible external link -->
-  <az-link 
-    label="Visit Documentation"
-    href="https://docs.example.com"
-    :external="true"
-    aria-label="Visit external documentation (opens in new tab)">
-  </az-link>
+  <!-- Add the component to your app layout -->
+  <az-confirm-dialog />
 </template>
 
 <script setup>
-import AzLink from '@/components/az/link/az-link.vue';
+import AzConfirmDialog from '@azoom/primevue-theme-generator/components/az/confirmDialog/az-confirm-dialog.vue';
 </script>
 ```
 
+**Usage with Composable:**
+```vue
+<template>
+  <button @click="showDeleteConfirm">Delete Item</button>
+</template>
+
+<script setup>
+import { useAzConfirmDialog } from '@azoom/primevue-theme-generator/composables/use-az-confirm-dialog';
+
+const { showConfirm } = useAzConfirmDialog();
+
+const showDeleteConfirm = () => {
+  showConfirm({
+    message: 'Are you sure you want to delete this item?',
+    header: 'Confirm Deletion',
+    icon: 'warning',
+    iconProps: {
+      type: 'filled',
+      size: 20,
+      color: '#ef4444'
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    accept: () => {
+      // Handle deletion
+      console.log('Item deleted');
+    },
+    reject: () => {
+      // Handle cancellation
+      console.log('Deletion cancelled');
+    }
+  });
+};
+</script>
+```
+
+**Key Features:**
+- Japanese "閉じる" close button with icon
+- Custom icon support with configurable properties
+- Dark mode support
+- Customizable button labels and styling
+- Optional group support for multiple confirm dialogs
+- Advanced slot-based customization
+- TypeScript support
+
+**Complete API:**
+```typescript
+interface ConfirmDialogOptions {
+  message: string
+  header?: string
+  group?: string
+  icon?: string // AzIcon name (e.g., 'warning', 'info')
+  iconProps?: {
+    type?: 'outline' | 'filled' | 'duotone'
+    size?: number
+    bounded?: 'tight' | 'loose'
+    color?: string
+    [key: string]: any
+  }
+  accept?: () => void
+  reject?: () => void
+  acceptLabel?: string
+  rejectLabel?: string
+  acceptProps?: {
+    label?: string
+    severity?: 'primary' | 'secondary' | 'success' | 'info' | 'warn' | 'danger'
+    outlined?: boolean
+  }
+  rejectProps?: {
+    label?: string
+    severity?: 'primary' | 'secondary' | 'success' | 'info' | 'warn' | 'danger'
+    outlined?: boolean
+  }
+}
+```
+
+**Dependencies:**
+- PrimeVue ConfirmDialog component
+- PrimeVue ConfirmationService
+- AzIcon component
+- Nuxt 3 framework
+
+#### AzBreadcrumb Component
+Custom breadcrumb component with AzIcon home icon and consistent styling.
+
+**Basic Setup:**
+```vue
+<template>
+  <az-breadcrumb :model="breadcrumbItems" />
+</template>
+
+<script setup>
+import AzBreadcrumb from '@azoom/primevue-theme-generator/components/az/breadcrumb/az-breadcrumb.vue';
+
+const breadcrumbItems = [
+  { label: 'Products', url: '/products' },
+  { label: 'Electronics', url: '/products/electronics' },
+  { label: 'Smartphones' }
+];
+</script>
+```
+
+**Advanced Usage with Custom Home:**
+```vue
+<template>
+  <az-breadcrumb 
+    :home="customHome"
+    :model="breadcrumbItems" />
+</template>
+
+<script setup>
+import AzBreadcrumb from '@azoom/primevue-theme-generator/components/az/breadcrumb/az-breadcrumb.vue';
+
+const customHome = {
+  label: 'Dashboard',
+  url: '/dashboard'
+};
+
+const breadcrumbItems = [
+  { label: 'Settings', url: '/settings' },
+  { label: 'Profile', url: '/settings/profile' },
+  { label: 'Edit Profile' }
+];
+</script>
+```
+
+**Custom Separator:**
+```vue
+<template>
+  <az-breadcrumb :model="breadcrumbItems">
+    <template #separator>
+      <AzIcon name="chevron-right" size="12" />
+    </template>
+  </az-breadcrumb>
+</template>
+
+<script setup>
+import AzBreadcrumb from '@azoom/primevue-theme-generator/components/az/breadcrumb/az-breadcrumb.vue';
+import AzIcon from '@azoom/az-icons';
+
+const breadcrumbItems = [
+  { label: 'Home', url: '/' },
+  { label: 'Products', url: '/products' },
+  { label: 'Current Page' }
+];
+</script>
+```
+
+**Key Features:**
+- AzIcon home icon with consistent styling
+- Customizable home item
+- Custom separator support
+- Full PrimeVue Breadcrumb integration
+- Dark mode support
+- TypeScript support
+
 **Props:**
+- `home`: Custom home item (optional, defaults to `{ label: 'Home', url: '/' }`)
+- `model`: Array of breadcrumb items
+- All PrimeVue Breadcrumb props supported
 
-**Core Properties:**
-- `label`: Link text content
-- `href`: Link destination
-- `external`: Boolean to open link in new page/tab (default: false)
+**BreadcrumbItem Interface:**
+```typescript
+interface BreadcrumbItem {
+  label: string
+  url?: string
+  route?: any
+  target?: string
+  icon?: string
+  [key: string]: any
+}
+```
 
-**Styling & Variants:**
-- `semanticColor`: 'primary' | 'secondary' | 'text' | 'traditional' | 'white'
-- `variant`: 'primary' | 'secondary' | 'text' | 'traditional' | 'white'
-- `size`: 'xsm' | 'sm' | 'lg' | 'xlg'
-- `disabled`: Boolean for disabled state
-- `showDefaultIcon`: Boolean to show/hide the default external link icon
+#### InputNumber Component
+Customized PrimeVue InputNumber with right-aligned text for better number readability.
 
-**Element Selection Logic:**
-The component automatically chooses between `nuxt-link` and HTML `<a>` tag based on the following conditions:
-- Uses `<a>` tag if: any HTML-specific property is provided
-- Uses `nuxt-link` if: No HTML-specific properties are needed (pure internal navigation)
-
-**Nuxt-Link Properties (Internal Navigation):**
-- `replace`: Boolean to replace current history entry instead of adding new one
-- `activeClass`: CSS class applied when link is active
-- `exactActiveClass`: CSS class applied when link is exactly active
-- `ariaCurrent`: Accessibility attribute for active links ('page', 'step', 'location')
-- `prefetch`: Boolean to control prefetching behavior
-- `noPrefetch`: Boolean to disable prefetching
-- `prefetchOnHover`: Boolean to prefetch only on hover
-
-**HTML Anchor Properties (Triggers <a> tag usage):**
-- `download`: String | Boolean for file downloads (true = original filename, string = custom filename)
-- `hreflang`: String for language specification (e.g., 'en', 'es', 'fr')
-- `ping`: String for analytics tracking URLs
-- `referrerpolicy`: String for referrer control ('no-referrer', 'origin', etc.)
-- `type`: String for MIME type specification (e.g., 'application/pdf')
-
-**HTML Attributes:**
-- `id`: Unique identifier for the link element (optional)
-- `title`: Tooltip text that appears on hover (optional)
-
-**Accessibility (ARIA) Properties:**
-- `ariaLabel`: Alternative text for screen readers (optional)
-- `ariaDescribedby`: References element that describes the link (optional)
-
-**Note:** When any HTML-specific property is provided, the component automatically uses an `<a>` tag instead of `nuxt-link`, even for internal URLs. This enables features like internal file downloads, analytics tracking, and language specification for internal pages.
+**Note:** This component modifies the default left alignment to right alignment for improved number input UX.
 
 ## 🔧 Development
 
