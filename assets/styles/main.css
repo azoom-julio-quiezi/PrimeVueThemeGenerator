@@ -34,6 +34,9 @@
 	--font-p:                var(--text-base);
 	--font-caption:          var(--text-xs);
 
+	/* Fix Japanese font rendering for parentheses, brackets, etc. */
+	font-feature-settings: "palt";
+
 	--breakpoint-sm: calc(var(--rem-base) * 25.75); /* 360.5px */
 	--breakpoint-md: calc(var(--rem-base) * 55);   /* 770px */
 	--breakpoint-lg: calc(var(--rem-base) * 73);   /* 1022px */
