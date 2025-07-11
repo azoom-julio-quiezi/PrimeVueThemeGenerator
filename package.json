@@ -9,7 +9,9 @@
   "files": [
     "dist",
     "assets",
-    "components"
+    "components",
+    "composables",
+    "plugins"
   ],
   "scripts": {
     "create": "ts-node src/cli.ts create --output ./test",
@@ -22,10 +24,22 @@
   "keywords": [
     "primevue",
     "theme",
-    "generator"
+    "generator",
+    "vue",
+    "nuxt"
   ],
   "author": "",
   "license": "ISC",
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "primevue": "^3.0.0",
+    "@azoom/az-icons": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "nuxt": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/commander": "^2.12.0",
     "@types/jest": "^29.5.14",
