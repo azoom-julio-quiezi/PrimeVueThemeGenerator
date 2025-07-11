@@ -78,6 +78,23 @@ plugins/            # Nuxt plugins
 └── confirmation.client.ts
 ```
 
+### CLI Options
+
+The `create` command supports additional options:
+
+```bash
+# Create with default settings (copies everything)
+pnpm exec primevue-theme create
+
+# Skip components, composables, and plugins (import from package instead)
+pnpm exec primevue-theme create --skip-components
+
+# Specify custom output directory
+pnpm exec primevue-theme create -o ./src/themes --skip-components
+```
+
+**Note:** When using `--skip-components`, you'll need to import components, composables, and plugins from the package. See the [Import Reference](#import-reference) section below for complete examples.
+
 ### 2. Convert Figma Tokens
 
 Convert your Figma Design Tokens to PrimeVue theme tokens:
@@ -139,6 +156,62 @@ export default defineNuxtConfig({
 })
 ```
 
+## 📦 Import Reference
+
+### Default Usage (Components Copied)
+
+When using the default CLI behavior (components copied to your project):
+
+```typescript
+// Components
+import AzLabel from './components/az/label/az-label.vue';
+import AzLink from './components/az/link/az-link.vue';
+import AzDialog from './components/az/dialog/az-dialog.vue';
+import AzConfirmDialog from './components/az/confirmDialog/az-confirm-dialog.vue';
+import AzBreadcrumb from './components/az/breadcrumb/az-breadcrumb.vue';
+
+// Composables
+import { useAzConfirmDialog } from './composables/use-az-confirm-dialog';
+
+// Plugins (auto-registered in Nuxt)
+// No manual import needed - plugins are automatically copied
+```
+
+### Package Import Usage (--skip-components flag)
+
+When using the `--skip-components` flag:
+
+```typescript
+// Components
+import { 
+  AzLabel, 
+  AzLink, 
+  AzDialog, 
+  AzConfirmDialog, 
+  AzBreadcrumb 
+} from '@azoom/primevue-theme-generator/components';
+
+// Composables
+import { useAzConfirmDialog } from '@azoom/primevue-theme-generator/composables';
+
+// Plugins (manual registration required)
+import { confirmationPlugin } from '@azoom/primevue-theme-generator/plugins';
+```
+
+**Plugin Registration for Package Import:**
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: [
+    'primevue/nuxt'
+  ],
+  plugins: [
+    // Only needed when using --skip-components
+    '~/plugins/confirmation.client.ts'
+  ]
+})
+```
+
 ## 🎨 Custom Components
 
 Our design system includes several custom components that enhance PrimeVue with additional functionality and consistent styling:
@@ -176,10 +249,11 @@ Our design system includes several custom components that enhance PrimeVue with 
 </template>
 
 <script setup>
-import AzLabel from '@azoom/primevue-theme-generator/components/az/label/az-label.vue';
-import AzLink from '@azoom/primevue-theme-generator/components/az/link/az-link.vue';
-import AzDialog from '@azoom/primevue-theme-generator/components/az/dialog/az-dialog.vue';
-import AzConfirmDialog from '@azoom/primevue-theme-generator/components/az/confirmDialog/az-confirm-dialog.vue';
+// See Import Reference section above for import examples
+import AzLabel from './components/az/label/az-label.vue';
+import AzLink from './components/az/link/az-link.vue';
+import AzDialog from './components/az/dialog/az-dialog.vue';
+import AzConfirmDialog from './components/az/confirmDialog/az-confirm-dialog.vue';
 </script>
 ```
 
@@ -245,7 +319,8 @@ Custom confirm dialog with Japanese close button, icon support, and enhanced sty
 </template>
 
 <script setup>
-import AzConfirmDialog from '@azoom/primevue-theme-generator/components/az/confirmDialog/az-confirm-dialog.vue';
+// See Import Reference section above for import examples
+import AzConfirmDialog from './components/az/confirmDialog/az-confirm-dialog.vue';
 </script>
 ```
 
@@ -256,7 +331,8 @@ import AzConfirmDialog from '@azoom/primevue-theme-generator/components/az/confi
 </template>
 
 <script setup>
-import { useAzConfirmDialog } from '@azoom/primevue-theme-generator/composables/use-az-confirm-dialog';
+// See Import Reference section above for import examples
+import { useAzConfirmDialog } from './composables/use-az-confirm-dialog';
 
 const { showConfirm } = useAzConfirmDialog();
 
@@ -338,6 +414,9 @@ interface ConfirmDialogOptions {
 - AzIcon component
 - Nuxt 3 framework
 
+**Plugin Setup:**
+The confirmation plugin is automatically copied to your project. For Nuxt 3, it will be auto-registered if placed in the `plugins/` directory. See the [Import Reference](#import-reference) section above for plugin registration when using `--skip-components`.
+
 #### AzBreadcrumb Component
 Custom breadcrumb component with AzIcon home icon and consistent styling.
 
@@ -348,7 +427,8 @@ Custom breadcrumb component with AzIcon home icon and consistent styling.
 </template>
 
 <script setup>
-import AzBreadcrumb from '@azoom/primevue-theme-generator/components/az/breadcrumb/az-breadcrumb.vue';
+// See Import Reference section above for import examples
+import AzBreadcrumb from './components/az/breadcrumb/az-breadcrumb.vue';
 
 const breadcrumbItems = [
   { label: 'Products', url: '/products' },
@@ -367,7 +447,8 @@ const breadcrumbItems = [
 </template>
 
 <script setup>
-import AzBreadcrumb from '@azoom/primevue-theme-generator/components/az/breadcrumb/az-breadcrumb.vue';
+// See Import Reference section above for import examples
+import AzBreadcrumb from './components/az/breadcrumb/az-breadcrumb.vue';
 
 const customHome = {
   label: 'Dashboard',
@@ -393,7 +474,8 @@ const breadcrumbItems = [
 </template>
 
 <script setup>
-import AzBreadcrumb from '@azoom/primevue-theme-generator/components/az/breadcrumb/az-breadcrumb.vue';
+// See Import Reference section above for import examples
+import AzBreadcrumb from './components/az/breadcrumb/az-breadcrumb.vue';
 import AzIcon from '@azoom/az-icons';
 
 const breadcrumbItems = [
