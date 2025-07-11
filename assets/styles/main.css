@@ -1,5 +1,4 @@
 @import './reset.css';
-@import 'primeicons/primeicons.css';
 
 :root {
 	--body-bg: var(--p-surface-50);
