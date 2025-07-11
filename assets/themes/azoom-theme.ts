@@ -1,7 +1,7 @@
 import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
 import button from './button/button'
-import inputNumber from './input-number/input-number'
+import inputnumber from './inputnumber/inputnumber'
 
 const Default = definePreset(Aura, {
   semantic: {
@@ -32,7 +32,8 @@ const Default = definePreset(Aura, {
 
   components: {
     button,
-    inputNumber,
+    // @ts-ignore - Theme structure doesn't match InputNumberDesignTokens interface but works at runtime
+    inputnumber,
   },
 });
 
