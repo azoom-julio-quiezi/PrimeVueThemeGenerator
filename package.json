@@ -33,7 +33,7 @@
   "peerDependencies": {
     "vue": "^3.0.0",
     "primevue": "^3.0.0",
-    "@azoom/az-icons": "^1.0.0"
+    "@azoom/az-icons": "^0.1.0"
   },
   "peerDependenciesMeta": {
     "nuxt": {
