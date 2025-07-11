@@ -81,8 +81,11 @@ const isHomeItem = (item: any) => {
 
 <style lang="scss" scoped>
 .home {
+  position: relative;
+  top: 2px;
   color: var(--p-navigation-item-icon-color);
   transition: color 0.2s;
+  text-decoration: none;
 
   &:hover {
     color: var(--p-navigation-item-hover-color);
@@ -92,6 +95,7 @@ const isHomeItem = (item: any) => {
 .breadcrumb {
   color: var(--p-breadcrumb-item-color);
   transition: color 0.2s;
+  text-decoration: none;
 
   &:hover {
     color: var(--p-breadcrumb-item-hover-color);
@@ -100,13 +104,5 @@ const isHomeItem = (item: any) => {
 
 .breadcrumb.-text {
   color: var(--p-breadcrumb-item-color);
-}
-
-:deep(.p-breadcrumb .item) {
-  transition: color 0.2s;
-
-  &:hover {
-    color: var(--p-breadcrumb-item-hover-color);
-  }
 }
 </style>
