@@ -23,14 +23,18 @@ This package has the following peer dependencies that must be installed in your 
 
 ```bash
 # Required peer dependencies
-pnpm add vue primevue @azoom/az-icons nuxt@^3.0.0
+pnpm add vue primevue @primevue/nuxt-module @primeuix/themes @azoom/az-icons nuxt@^3.0.0 sass @nuxtjs/google-fonts
 ```
 
 **Peer Dependencies:**
 - `vue` (^3.0.0) - Vue 3 framework
-- `primevue` (^3.0.0) - PrimeVue component library
-- `@azoom/az-icons` (^1.0.0) - Icon library used by components
+- `primevue` (^4.0.0) - PrimeVue component library
+- `@primevue/nuxt-module` (^4.0.0) - PrimeVue Nuxt module
+- `@primeuix/themes` (^1.0.0) - PrimeVue theme system
+- `@azoom/az-icons` (^0.1.0) - Icon library used by components
 - `nuxt` (^3.0.0) - Nuxt 3 framework
+- `sass` (^1.87.0) - Sass preprocessor for styling
+- `@nuxtjs/google-fonts` (^1.0.0) - Google Fonts integration for Nuxt
 
 **Note:** These are declared as peer dependencies to avoid version conflicts and bundle bloat. Your Nuxt project should install these dependencies directly.
 
@@ -145,14 +149,27 @@ export default {
 
 ```typescript
 // nuxt.config.ts
+import Aura from '@primeuix/themes/aura'
+
 export default defineNuxtConfig({
   modules: [
-    'primevue/nuxt'
+    '@primevue/nuxt-module',
+    '@azoom/az-icons',
+    '@nuxtjs/google-fonts'
   ],
   primevue: {
-    theme: 'aura',
-    components: {}
-  }
+    autoImport: false,
+    options: {
+      theme: {
+        preset: Aura,
+      },
+    },
+    components: {
+      prefix: 'v',
+      include: [/*insert primevue components*/],
+    },
+    importTheme: { from: '@/assets/themes/azoom-theme.ts' },
+  },
 })
 ```
 
