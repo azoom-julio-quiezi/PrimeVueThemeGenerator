@@ -2,6 +2,11 @@
   <v-dialog v-bind="$attrs"
     :visible="visible"
     :pt="{
+      headerActions: {
+        style: {
+          gap: '0',
+        }
+      },
       pcCloseButton: {
         root: {
           style: {
