@@ -81,8 +81,6 @@ const isHomeItem = (item: any) => {
 
 <style lang="scss" scoped>
 .home {
-  position: relative;
-  top: 2px;
   color: var(--p-navigation-item-icon-color);
   transition: color 0.2s;
   text-decoration: none;
