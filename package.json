@@ -10,8 +10,7 @@
     "dist",
     "assets",
     "components",
-    "composables",
-    "plugins"
+    "composables"
   ],
   "scripts": {
     "create": "ts-node src/cli.ts create --output ./test",
