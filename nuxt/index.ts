@@ -53,14 +53,6 @@ export default defineNuxtModule({
     nuxt.options.css.push(resolve('../assets/styles/main.css'))
     nuxt.options.css.push(resolve('../assets/styles/reset.css'))
 
-    // Add theme files to Nuxt's virtual imports
-    nuxt.hook('nitro:config', (config) => {
-      config.virtual = config.virtual || {}
-      config.virtual['#azoom-theme'] = `export { default } from '${resolve('../assets/themes/azoom-theme.ts')}'`
-      config.virtual['#azoom-button-theme'] = `export { default } from '${resolve('../assets/themes/button.ts')}'`
-      config.virtual['#azoom-inputnumber-theme'] = `export { default } from '${resolve('../assets/themes/inputnumber.ts')}'`
-    })
-
     // Auto-create theme file if it doesn't exist
     nuxt.hook('ready', () => {
       const fs = require('fs')
