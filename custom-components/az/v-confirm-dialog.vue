@@ -39,12 +39,12 @@
 
           <!-- Action buttons -->
           <div class="area -actions">
-            <v-button 
+            <Button 
               :label="message.acceptLabel || 'Yes'"
               :severity="message.acceptProps?.severity"
               :outlined="message.acceptProps?.outlined"
               @click="acceptCallback" />
-            <v-button 
+            <Button 
               :label="message.rejectLabel || 'No'"
               :severity="message.rejectProps?.severity || 'secondary'"
               :outlined="message.rejectProps?.outlined"
@@ -58,6 +58,7 @@
 
 <script lang="ts" setup>
 import ConfirmDialog from 'primevue/confirmdialog'
+import Button from 'primevue/button'
 
 interface Props {
   group?: string

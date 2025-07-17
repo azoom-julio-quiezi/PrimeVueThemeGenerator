@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-bind="$attrs"
+  <Dialog v-bind="$attrs"
     :visible="visible"
     :pt="{
       headerActions: {
@@ -38,10 +38,12 @@
       <slot :name="name"
         v-bind="slotData" />
     </template>
-  </v-dialog>
+  </Dialog>
 </template>
 
 <script lang="ts" setup>
+import Dialog from 'primevue/dialog'
+
 interface Props {
   visible?: boolean
 }
