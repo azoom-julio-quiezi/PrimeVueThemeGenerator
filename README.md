@@ -178,6 +178,20 @@ const nuxtApp = useNuxtApp()
 nuxtApp.vueApp.use(ConfirmationService)
 </script>
 ```
+** 🎨  Custom Tokens:**
+- `button` - Button component styling and variants
+- `inputNumber` - InputNumber component with right-aligned text
+
+```typescript
+import { button, inputnumber } from '@azoom/primevue-theme-generator/assets/themes'
+
+const Default = definePreset(Aura, {
+  components: {
+    button,
+    inputnumber,
+  },
+});
+```
 
 ## 🎨 Custom Components
 
@@ -457,10 +471,6 @@ interface BreadcrumbItem {
   [key: string]: any
 }
 ```
-
-#### InputNumber Component
-Customized PrimeVue InputNumber with right-aligned text for better number readability.
-
 **Note:** This component modifies the default left alignment to right alignment for improved number input UX.
 
 ## 🎨 Figma Token Conversion
