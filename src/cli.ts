@@ -42,8 +42,8 @@ program
       console.log(`✅ Theme structure created successfully in ${outputAssetsDir}!`);
 
       console.log(`\n📦 Components and composables are imported from the package:`);
-      console.log(`   import { AzBreadcrumb } from '@azoom/primevue-theme-generator/components'`);
-      console.log(`   import { useAzConfirmDialog } from '@azoom/primevue-theme-generator/composables'`);
+      console.log(`   import { Breadcrumb, Dialog, ConfirmDialog, Label, Link } from '@azoom/primevue-theme-generator/custom-components'`);
+      console.log(`   import { useConfirmDialog } from '@azoom/primevue-theme-generator/custom-composables'`);
       
       console.log(`\n🎉 Theme structure created successfully!`);
     } catch (error) {
