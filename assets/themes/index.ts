@@ -1,2 +1,2 @@
 export { default as button } from './button'
-export { default as inputNumber } from './inputnumber' 
+export { default as inputnumber } from './inputnumber' 
