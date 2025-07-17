@@ -9,17 +9,12 @@ A comprehensive design system package with two main features: **Custom AZoom The
 
 ## 📦 Installation
 
-### Option 1: Install from npm (Recommended)
-```bash
-pnpm add @azoom/primevue-theme-generator
-```
-
-### Option 2: Install from GitHub (Development)
+### Install from GitHub
 ```bash
 pnpm add git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
 
-**Note:** The npm package is recommended for production use. Use the GitHub URL for development or testing the latest changes.
+**Note:** The package will automatically build itself during installation and create the necessary theme files.
 
 ### Dependencies
 
