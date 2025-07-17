@@ -21,7 +21,7 @@
     "test:watch": "jest --watch",
     "build": "rm -rf dist && tsc",
     "prepare": "pnpm run build && test -f dist/cli.js && chmod +x dist/cli.js",
-    "postinstall": "node dist/cli.js create --output ."
+    "postinstall": "if [ -f dist/cli.js ]; then node dist/cli.js create --output .; else echo 'CLI not found, building package...' && pnpm run build && node dist/cli.js create --output .; fi"
   },
   "keywords": [
     "primevue",
