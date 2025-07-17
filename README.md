@@ -180,15 +180,13 @@ nuxtApp.vueApp.use(ConfirmationService)
 ```
 ** 🎨  Custom Tokens:**
 - `button` - Button component styling and variants
-- `inputNumber` - InputNumber component with right-aligned text
 
 ```typescript
-import { button, inputnumber } from '@azoom/primevue-theme-generator/assets/themes'
+import { button } from '@azoom/primevue-theme-generator/assets/themes'
 
 const Default = definePreset(Aura, {
   components: {
     button,
-    inputnumber,
   },
 });
 ```
