@@ -99,3 +99,14 @@ small {
     --font-heading-small : var(--text-md);   /* 17.5px */
   }
 }
+
+/* InputNumber */
+.p-inputnumber-input {
+	text-align: right;
+}
+.p-inputnumber .p-inputtext {
+	text-align: right;
+}
+.p-float-label .p-inputnumber .p-inputtext {
+	text-align: right;
+}
