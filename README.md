@@ -6,16 +6,24 @@ A tool that converts Figma Design Tokens to PrimeVue themes and provides custom 
 
 - **Figma Token Conversion**: Converts Studio Tokens to PrimeVue-compatible theme tokens
 - **Base AZoom Theme**: Provides a complete base theme with component configurations
-- **Custom Components**: Pre-built design system components (Button, Link, and more coming soon)
-- **Light & Dark Themes**: Full support for both theme modes
+- **Custom Components**: Pre-built design system components (Label, Link, Dialog, ConfirmDialog, Breadcrumb)
+- **Light Theme**: Complete theme support with component configurations
 - **Type Safety**: Built with TypeScript for better development experience
 - **Comprehensive Testing**: Extensive test coverage for reliable token conversion
 
 ## 📦 Installation
 
+### Option 1: Install from npm (Recommended)
+```bash
+pnpm add @azoom/primevue-theme-generator
+```
+
+### Option 2: Install from GitHub (Development)
 ```bash
 pnpm add git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
+
+**Note:** The npm package is recommended for production use. Use the GitHub URL for development or testing the latest changes.
 
 ### Dependencies
 
@@ -57,10 +65,8 @@ This creates the following structure:
 assets/
 ├── themes/          # Theme configuration files
 │   ├── azoom-theme.ts
-│   ├── button/
-│   │   └── button.ts
-│   └── inputnumber/
-│       └── inputnumber.ts
+│   ├── button.ts
+│   └── inputnumber.ts
 └── styles/          # Global styles
     ├── main.css
     └── reset.css
@@ -68,7 +74,7 @@ assets/
 
 **Note:** Components and composables are imported from the package. See the [Import Reference](#import-reference) section below for complete examples.
 
-**Important:** The `AzConfirmDialog` component requires the PrimeVue ConfirmationService to be registered in your `app.vue` file. See the [ConfirmationService Setup](#-confirmationservice-setup) section below.
+**Important:** The `ConfirmDialog` component requires the PrimeVue ConfirmationService to be registered in your `app.vue` file. See the [ConfirmationService Setup](#-confirmationservice-setup) section below.
 
 ### 2. Convert Figma Tokens
 
@@ -138,10 +144,22 @@ export default defineNuxtConfig({
     },
     components: {
       prefix: 'v',
-      include: [/*insert primevue components*/],
+      include: [
+        // PrimeVue components example
+        'Button', 'InputText', 'Select', 'Toast',
+        // Custom components (these will override PrimeVue ones with same names)
+        'Breadcrumb', 'ConfirmDialog', 'Dialog'
+      ],
     },
     importTheme: { from: '@/assets/themes/azoom-theme.ts' },
   },
+  // Auto-import custom components
+  components: {
+    global: true,
+    dirs: [
+      '~/node_modules/@azoom/primevue-theme-generator/custom-components'
+    ]
+  }
 })
 ```
 
@@ -154,15 +172,15 @@ Import components and composables directly from the package:
 ```typescript
 // Components
 import { 
-  AzLabel, 
-  AzLink, 
-  AzDialog, 
-  AzConfirmDialog, 
-  AzBreadcrumb 
-} from '@azoom/primevue-theme-generator/components';
+  Breadcrumb, 
+  Dialog, 
+  ConfirmDialog, 
+  Label, 
+  Link 
+} from '@azoom/primevue-theme-generator/custom-components';
 
 // Composables
-import { useAzConfirmDialog } from '@azoom/primevue-theme-generator/composables';
+import { useConfirmDialog } from '@azoom/primevue-theme-generator/custom-composables';
 
 // Register ConfirmationService in app.vue (see below)
 ```
@@ -195,43 +213,42 @@ Our design system includes several custom components that enhance PrimeVue with 
 
 | Component | Description | Key Features |
 |-----------|-------------|--------------|
-| **AzLabel** | Form label with required indicators | Multiple variants, sizes, accessibility |
-| **AzLink** | Smart link component | Auto-detects internal/external, multiple variants |
-| **AzDialog** | Enhanced dialog with custom close | Japanese close button, dark mode support |
-| **AzConfirmDialog** | Custom confirm dialog | Japanese close button, icon support, dark mode |
-| **AzBreadcrumb** | Navigation breadcrumb | AzIcon home, custom separators, dark mode |
-| **InputNumber** | Customized number input | Right-aligned text for better readability |
+| **Label** | Form label with required indicators | Multiple variants, sizes, accessibility |
+| **Link** | Smart link component | Auto-detects internal/external, multiple variants |
+| **Dialog** | Enhanced dialog with custom close | Japanese close button |
+| **ConfirmDialog** | Custom confirm dialog | Japanese close button, icon support |
+| **Breadcrumb** | Navigation breadcrumb | AzIcon home, custom separators |
 
 ### Quick Examples
 
 ```vue
 <template>
-  <!-- AzLabel with required indicator -->
-  <az-label label="Email" html-for="email" required variant="text" />
+  <!-- Label with required indicator -->
+  <v-label label="Email" html-for="email" required variant="text" />
   <input id="email" type="email" />
 
-  <!-- AzLink with smart element detection -->
-  <az-link label="About Us" href="/about" variant="primary" />
-  <az-link label="External" href="https://example.com" :external="true" />
+  <!-- Link with smart element detection -->
+  <v-link label="About Us" href="/about" variant="primary" />
+  <v-link label="External" href="https://example.com" :external="true" />
 
-  <!-- AzDialog with custom close button -->
-  <az-dialog v-model:visible="dialogVisible" header="Dialog Title">
+  <!-- Dialog with custom close button -->
+  <v-dialog v-model:visible="dialogVisible" header="Dialog Title">
     <p>Content here</p>
-  </az-dialog>
+  </v-dialog>
 
-  <!-- AzConfirmDialog with custom styling -->
-  <az-confirm-dialog group="custom" />
+  <!-- ConfirmDialog with custom styling -->
+  <v-confirm-dialog group="custom" />
 </template>
 
 <script setup>
 // See Import Reference section above for import examples
-import { AzLabel, AzLink, AzDialog, AzConfirmDialog } from '@azoom/primevue-theme-generator/components';
+import { Label, Link, Dialog, ConfirmDialog } from '@azoom/primevue-theme-generator/custom-components';
 </script>
 ```
 
 ### Component Details
 
-#### AzLabel Component
+#### Label Component
 Form label with built-in required field indicators and accessibility features.
 
 **Key Props:**
@@ -247,7 +264,7 @@ Form label with built-in required field indicators and accessibility features.
 - Full accessibility support
 - Custom color overrides
 
-#### AzLink Component
+#### Link Component
 Smart link component that automatically chooses between `nuxt-link` and `<a>` tag.
 
 **Key Props:**
@@ -263,7 +280,7 @@ Smart link component that automatically chooses between `nuxt-link` and `<a>` ta
 - Built-in external link icon
 - Prefetching controls for performance
 
-#### AzDialog Component
+#### Dialog Component
 Enhanced dialog with custom Japanese close button and full PrimeVue integration.
 
 **Key Props:**
@@ -272,11 +289,10 @@ Enhanced dialog with custom Japanese close button and full PrimeVue integration.
 
 **Features:**
 - Custom "閉じる" close button with icon
-- Dark mode support
 - Full slot passthrough
 - Enhanced hover effects
 
-#### AzConfirmDialog Component
+#### ConfirmDialog Component
 Custom confirm dialog with Japanese close button, icon support, and enhanced styling.
 
 **Required Service for ConfirmDialog Component**
@@ -287,12 +303,12 @@ Custom confirm dialog with Japanese close button, icon support, and enhanced sty
 ```vue
 <template>
   <!-- Add the component to your app layout -->
-  <az-confirm-dialog />
+  <v-confirm-dialog />
 </template>
 
 <script setup>
 // See Import Reference section above for import examples
-import { AzConfirmDialog } from '@azoom/primevue-theme-generator/components';
+import { ConfirmDialog } from '@azoom/primevue-theme-generator/custom-components';
 </script>
 ```
 
@@ -304,9 +320,9 @@ import { AzConfirmDialog } from '@azoom/primevue-theme-generator/components';
 
 <script setup>
 // See Import Reference section above for import examples
-import { useAzConfirmDialog } from '@azoom/primevue-theme-generator/composables';
+import { useConfirmDialog } from '@azoom/primevue-theme-generator/custom-composables';
 
-const { showConfirm } = useAzConfirmDialog();
+const { showConfirm } = useConfirmDialog();
 
 const showDeleteConfirm = () => {
   showConfirm({
@@ -343,7 +359,6 @@ const showDeleteConfirm = () => {
 **Key Features:**
 - Japanese "閉じる" close button with icon
 - Custom icon support with configurable properties
-- Dark mode support
 - Customizable button labels and styling
 - Optional group support for multiple confirm dialogs
 - Advanced slot-based customization
@@ -389,18 +404,18 @@ interface ConfirmDialogOptions {
 **Service Setup:**
 The ConfirmationService must be registered in your `app.vue` file. See the [ConfirmationService Setup](#-confirmationservice-setup) section above.
 
-#### AzBreadcrumb Component
+#### Breadcrumb Component
 Custom breadcrumb component with AzIcon home icon and consistent styling.
 
 **Basic Setup:**
 ```vue
 <template>
-  <az-breadcrumb :model="breadcrumbItems" />
+  <v-breadcrumb :model="breadcrumbItems" />
 </template>
 
 <script setup>
 // See Import Reference section above for import examples
-import { AzBreadcrumb } from '@azoom/primevue-theme-generator/components';
+import { Breadcrumb } from '@azoom/primevue-theme-generator/custom-components';
 
 const breadcrumbItems = [
   { label: 'Products', url: '/products' },
@@ -413,14 +428,14 @@ const breadcrumbItems = [
 **Advanced Usage with Custom Home:**
 ```vue
 <template>
-  <az-breadcrumb 
+  <v-breadcrumb 
     :home="customHome"
     :model="breadcrumbItems" />
 </template>
 
 <script setup>
 // See Import Reference section above for import examples
-import { AzBreadcrumb } from '@azoom/primevue-theme-generator/components';
+import { Breadcrumb } from '@azoom/primevue-theme-generator/custom-components';
 
 const customHome = {
   label: 'Dashboard',
@@ -438,16 +453,16 @@ const breadcrumbItems = [
 **Custom Separator:**
 ```vue
 <template>
-  <az-breadcrumb :model="breadcrumbItems">
+  <v-breadcrumb :model="breadcrumbItems">
     <template #separator>
       <AzIcon name="chevron-right" size="12" />
     </template>
-  </az-breadcrumb>
+  </v-breadcrumb>
 </template>
 
 <script setup>
 // See Import Reference section above for import examples
-import { AzBreadcrumb } from '@azoom/primevue-theme-generator/components';
+import { Breadcrumb } from '@azoom/primevue-theme-generator/custom-components';
 import AzIcon from '@azoom/az-icons';
 
 const breadcrumbItems = [
@@ -463,7 +478,6 @@ const breadcrumbItems = [
 - Customizable home item
 - Custom separator support
 - Full PrimeVue Breadcrumb integration
-- Dark mode support
 - TypeScript support
 
 **Props:**
@@ -505,11 +519,13 @@ Customized PrimeVue InputNumber with right-aligned text for better number readab
 ├── assets/               # Base theme files
 │   ├── styles/          # General styles
 │   └── themes/          # Theme templates
-├── components/          # Custom design system components
-│   └── az/             # AZoom design system components
-├── tokens/             # Example token files
-├── package.json        # Project configuration
-└── tsconfig.json      # TypeScript configuration
+├── custom-components/    # Custom design system components
+│   └── az/              # AZoom design system components
+├── custom-composables/   # Custom composables
+│   └── az/              # AZoom composables
+├── tokens/              # Example token files
+├── package.json         # Project configuration
+└── tsconfig.json       # TypeScript configuration
 ```
 
 ### Local Development
