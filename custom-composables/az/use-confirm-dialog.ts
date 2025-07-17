@@ -28,7 +28,7 @@ interface ConfirmDialogOptions {
   }
 }
 
-export function useAzConfirmDialog() {
+export function useConfirmDialog() {
   let confirm: ReturnType<typeof useConfirm> | null = null
 
   try {

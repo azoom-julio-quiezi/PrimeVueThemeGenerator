@@ -1,14 +1,14 @@
 <template>
   <ClientOnly>
-    <ConfirmDialog :group="group" class="az-confirm-dialog">
+    <ConfirmDialog :group="group" class="confirm-dialog">
       <template #container="{ message, acceptCallback, rejectCallback, closeCallback }">
-        <div class="confirm-dialog-container">
+        <div class="container">
           <!-- Title (top left) -->
-          <h2 class="dialog-title">{{ message.header }}</h2>
+          <h2 class="title">{{ message.header }}</h2>
 
           <!-- Custom close button (top right) -->
           <button 
-            class="close-button"
+            class="button -close"
             @click="rejectCallback"
             type="button">
             <AzIcon
@@ -20,9 +20,9 @@
             <span class="text">閉じる</span>
           </button>
 
-          <!-- Message content -->
-          <div class="dialog-content">
-            <p class="dialog-message">
+           <!-- Message content -->
+          <div class="content">
+            <p class="message">
               <AzIcon
                 v-if="message.icon"
                 :name="message.icon"
@@ -32,13 +32,13 @@
                   bounded: message.iconProps?.bounded ?? 'tight',
                   ...(message.iconProps || {})
                 }"
-                class="message-icon" />
+                class="icon" />
               {{ message.message }}
             </p>
           </div>
 
           <!-- Action buttons -->
-          <div class="action-buttons">
+          <div class="area -actions">
             <v-button 
               :label="message.acceptLabel || 'Yes'"
               :severity="message.acceptProps?.severity"
@@ -67,7 +67,7 @@ defineProps<Props>()
 </script>
 
 <style lang="scss" scoped>
-.confirm-dialog-container {
+.confirm-dialog > .container {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -75,89 +75,72 @@ defineProps<Props>()
   background: var(--p-surface-0);
   border-radius: 0.5rem;
   min-width: 400px;
-}
 
-.dialog-title {
-  position: absolute;
-  top: 1rem;
-  left: 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--p-surface-900);
-  margin: 0;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  height: 2.5rem;
-}
-
-.close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s;
-  border: none;
-  background: none;
-  color: inherit;
-  height: 2.5rem;
-  padding: 0 0.5rem;
-
-  &:hover {
-    background-color: var(--p-surface-100);
-  }
-
-  > .icon {
-    padding-top: 1px;
-  }
-
-  > .text {
-    font-size: 1rem;
-    font-weight: 500;
-  }
-}
-
-.dialog-content {
-  margin: 3rem 0 1.5rem 0;
-}
-
-.dialog-message {
-  color: var(--p-surface-700);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 1rem 0;
-
-  .message-icon {
+  .title {
+    position: absolute;
+    top: 1rem;
+    left: 1.5rem;
     font-size: 1.25rem;
-    color: var(--p-primary-500);
+    font-weight: 600;
+    color: var(--p-surface-900);
+    margin: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
   }
-}
 
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
+  .button.-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+    border: none;
+    background: none;
+    color: inherit;
+    height: 2.5rem;
+    padding: 0 0.5rem;
 
-/* Dark mode support */
-:root[class='p-dark'] .dialog-title {
-  color: var(--p-surface-0);
-}
+    &:hover {
+      background-color: var(--p-surface-100);
+    }
 
-:root[class='p-dark'] .close-button:hover {
-  background-color: var(--p-surface-700);
-}
+    > .icon {
+      padding-top: 1px;
+    }
 
-:root[class='p-dark'] .confirm-dialog-container {
-  background: var(--p-surface-900);
-}
+    > .text {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
 
-:root[class='p-dark'] .dialog-message {
-  color: var(--p-surface-300);
+  .content {
+    margin: 3rem 0 1.5rem 0;
+  }
+
+  .message {
+    color: var(--p-surface-700);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem 0;
+
+    .icon {
+      font-size: 1.25rem;
+      color: var(--p-primary-500);
+    }
+  }
+
+  .area.-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
 }
 </style> 

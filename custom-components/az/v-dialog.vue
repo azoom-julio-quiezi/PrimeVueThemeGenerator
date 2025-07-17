@@ -78,9 +78,4 @@ defineEmits<Emits>()
     font-weight: 500;
   }
 }
-
-/* Dark mode support */
-:root[class='p-dark'] .custom-close-button:hover {
-  background-color: var(--p-surface-700);
-}
 </style>

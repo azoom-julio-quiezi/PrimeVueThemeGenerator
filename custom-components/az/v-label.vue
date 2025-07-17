@@ -99,7 +99,6 @@ defineProps({
   font-size: 0.875rem;
 }
 
-/* Size variants */
 .p-az-label-sm {
   font-size: 0.875rem;
 }
@@ -112,14 +111,12 @@ defineProps({
   font-size: 1.125rem;
 }
 
-/* Focus styles for accessibility */
 .p-az-label:focus-within {
   outline: 2px solid var(--p-primary-color);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-/* Disabled state */
 .p-az-label:has(+ input:disabled),
 .p-az-label:has(+ select:disabled),
 .p-az-label:has(+ textarea:disabled) {
