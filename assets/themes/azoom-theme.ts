@@ -1,7 +1,6 @@
 import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
-import button from './button'
-import inputnumber from './inputnumber'
+import { button, inputnumber } from '@azoom/primevue-theme-generator/assets/themes'
 
 const Default = definePreset(Aura, {
   semantic: {
