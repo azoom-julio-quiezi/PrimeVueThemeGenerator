@@ -49,9 +49,9 @@ export default defineNuxtModule({
       }
     ])
 
-    // Add CSS
-    nuxt.options.css.push(resolve('../assets/styles/main.css'))
+    // Add CSS files from package
     nuxt.options.css.push(resolve('../assets/styles/reset.css'))
+    nuxt.options.css.push(resolve('../assets/styles/main.css'))
 
     // Auto-create theme file if it doesn't exist
     nuxt.hook('ready', () => {
