@@ -14,7 +14,13 @@ A comprehensive design system package with two main features: **Custom AZoom The
 pnpm add git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
 
-**Note:** The package will automatically build itself during installation and create the necessary theme files.
+**If you use the Nuxt module (`@azoom/primevue-theme-generator/nuxt`), the theme file will be created automatically the first time Nuxt starts.**
+
+**If you are not using the Nuxt module, or want to (re)generate the theme file manually, run:**
+```bash
+pnpm exec primevue-theme create
+```
+This will generate the theme file in your project root.
 
 ### Dependencies
 
