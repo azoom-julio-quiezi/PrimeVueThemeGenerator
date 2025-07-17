@@ -1,7 +1,7 @@
 import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
-import button from './button/button'
-import inputnumber from './inputnumber/inputnumber'
+import button from './button'
+import inputnumber from './inputnumber'
 
 const Default = definePreset(Aura, {
   semantic: {
@@ -39,7 +39,4 @@ const Default = definePreset(Aura, {
 
 export default {
   preset: Default,
-  options: {
-    darkModeSelector: '.p-dark',
-  },
 }
