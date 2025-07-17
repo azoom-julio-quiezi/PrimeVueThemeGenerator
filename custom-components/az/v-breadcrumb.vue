@@ -35,7 +35,7 @@
 
 <script lang="ts" setup>
 import Breadcrumb from 'primevue/breadcrumb'
-import AzHomeIcon from '../home-icon/az-home-icon.vue'
+import AzHomeIcon from './v-home-icon.vue'
 
 interface BreadcrumbItem {
   label: string
