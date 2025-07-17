@@ -42,10 +42,6 @@
 	--breakpoint-xl: calc(var(--rem-base) * 103);   /* 1442px */
 }
 
-:root[class="p-dark"] {
-	--body-bg: var(--p-surface-950);
-}
-
 html {
   font-size: 14px; /* 1rem = 14px */
 }
