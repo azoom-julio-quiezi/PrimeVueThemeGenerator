@@ -37,13 +37,22 @@ program
         console.log(`Created directory: ${outputAssetsDir}`);
       }
 
-      // Always copy themes/assets
-      copyTemplateFiles(packageAssetsDir, outputAssetsDir);
-      console.log(`✅ Theme structure created successfully in ${outputAssetsDir}!`);
+      // Copy only the main theme file
+      const themeFile = join(packageAssetsDir, 'themes', 'azoom-theme.ts');
+      const outputThemeFile = join(outputAssetsDir, 'themes', 'azoom-theme.ts');
+      
+      if (!existsSync(join(outputAssetsDir, 'themes'))) {
+        mkdirSync(join(outputAssetsDir, 'themes'), { recursive: true });
+      }
+      
+      copyFileSync(themeFile, outputThemeFile);
+      console.log(`✅ Theme file created: ${outputThemeFile}`);
 
-      console.log(`\n📦 Components and composables are imported from the package:`);
-      console.log(`   import { Breadcrumb, Dialog, ConfirmDialog, Label, Link } from '@azoom/primevue-theme-generator/custom-components'`);
-      console.log(`   import { useConfirmDialog } from '@azoom/primevue-theme-generator/custom-composables'`);
+      console.log(`\n📦 Components and composables are auto-imported by the Nuxt module:`);
+      console.log(`   Add '@azoom/primevue-theme-generator/nuxt' to your modules array`);
+      console.log(`   Components: v-label, v-link, v-dialog, v-confirm-dialog, v-breadcrumb`);
+      console.log(`   Composables: useConfirmDialog (auto-imported)`);
+      console.log(`   CSS and other theme files are imported automatically`);
       
       console.log(`\n🎉 Theme structure created successfully!`);
     } catch (error) {

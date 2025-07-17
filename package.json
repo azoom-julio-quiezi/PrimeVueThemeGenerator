@@ -9,16 +9,19 @@
   "files": [
     "dist",
     "assets",
-    "components",
-    "composables"
+    "custom-components",
+    "custom-composables",
+    "nuxt"
   ],
   "scripts": {
-    "create": "ts-node src/cli.ts create --output ./test",
+    "create-theme-test": "ts-node src/cli.ts create --output ./test",
+    "create-theme": "ts-node src/cli.ts create --output .",
     "convert-tokens": "ts-node src/cli.ts convert-tokens -i ./tokens/tokens.json -o ./test/themes/theme-tokens.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "rm -rf dist && tsc",
-    "prepare": "pnpm run build && test -f dist/cli.js && chmod +x dist/cli.js"
+    "prepare": "pnpm run build && test -f dist/cli.js && chmod +x dist/cli.js",
+    "postinstall": "node dist/cli.js create --output ."
   },
   "keywords": [
     "primevue",
