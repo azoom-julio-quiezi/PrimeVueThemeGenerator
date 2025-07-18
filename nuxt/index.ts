@@ -28,7 +28,8 @@ export default defineNuxtModule({
 
     addComponent({
       name: `${options.prefix}Dialog`,
-      filePath: resolve('../custom-components/az/v-dialog.vue')
+      filePath: resolve('../custom-components/az/v-dialog.vue'),
+      priority: 10 // Higher priority to override PrimeVue Dialog
     })
 
     addComponent({
@@ -38,7 +39,8 @@ export default defineNuxtModule({
 
     addComponent({
       name: `${options.prefix}Breadcrumb`,
-      filePath: resolve('../custom-components/az/v-breadcrumb.vue')
+      filePath: resolve('../custom-components/az/v-breadcrumb.vue'),
+      priority: 10 // Higher priority to override PrimeVue Breadcrumb
     })
 
     // Auto-import custom composables
