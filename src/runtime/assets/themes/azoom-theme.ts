@@ -1,6 +1,6 @@
 import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
-import { button } from '@azoom/primevue-theme-generator/assets/themes'
+import { button } from '@azoom/az-ui/assets/themes'
 
 const Default = definePreset(Aura, {
   semantic: {
@@ -16,7 +16,7 @@ const Default = definePreset(Aura, {
       700: '{neutral.700}',
       800: '{neutral.800}',
       900: '{neutral.900}',
-      950: '{neutral.950}'
+      950: '{neutral.950}',
     },
     colorScheme: {
       light: {
@@ -26,13 +26,13 @@ const Default = definePreset(Aura, {
           activeColor: '{primary.400}',
         },
       },
-    }
+    },
   },
 
   components: {
     button,
   },
-});
+})
 
 export default {
   preset: Default,

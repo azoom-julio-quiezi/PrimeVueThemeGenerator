@@ -1,18 +1,17 @@
 <template>
   <ClientOnly>
-    <ConfirmDialog :group="group" class="confirm-dialog">
-      <template #container="{ message, acceptCallback, rejectCallback, closeCallback }">
+    <confirm-dialog class="confirm-dialog"
+      :group="group">
+      <template #container="{ message, acceptCallback, rejectCallback }">
         <div class="container">
           <!-- Title (top left) -->
           <h2 class="title">{{ message.header }}</h2>
 
           <!-- Custom close button (top right) -->
-          <button 
-            class="button -close"
-            @click="rejectCallback"
-            type="button">
-            <AzIcon
-              class="icon"
+          <button class="button -close"
+            type="button"
+            @click="rejectCallback">
+            <az-icon class="icon"
               name="close"
               type="outline"
               size="14"
@@ -21,47 +20,41 @@
             <span class="text">閉じる</span>
           </button>
 
-           <!-- Message content -->
+          <!-- Message content -->
           <div class="content">
             <p class="message">
-              <AzIcon
-                v-if="message.icon"
+              <az-icon class="icon"
                 :name="message.icon"
                 v-bind="{
                   type: message.iconProps?.type ?? 'fill',
                   size: message.iconProps?.size ?? 16,
                   bounded: message.iconProps?.bounded ?? 'spacious',
                   color: message.iconProps?.color ?? 'var(--p-dialog-color)',
-                  ...(message.iconProps || {})
+                  ...(message.iconProps || {}),
                 }"
-                class="icon" />
+                v-if="message.icon" />
               {{ message.message }}
             </p>
           </div>
 
           <!-- Action buttons -->
           <div class="area -actions">
-            <Button 
-              :label="message.acceptLabel || 'Yes'"
+            <v-button :label="message.acceptLabel || 'Yes'"
               :severity="message.acceptProps?.severity"
               :outlined="message.acceptProps?.outlined"
               @click="acceptCallback" />
-            <Button 
-              :label="message.rejectLabel || 'No'"
-              :severity="message.rejectProps?.severity || 'secondary'"
+            <v-button :label="message.rejectLabel || 'No'"
+              :severity="message.rejectProps?.severity"
               :outlined="message.rejectProps?.outlined"
               @click="rejectCallback" />
           </div>
         </div>
       </template>
-    </ConfirmDialog>
+    </confirm-dialog>
   </ClientOnly>
 </template>
 
 <script lang="ts" setup>
-import ConfirmDialog from 'primevue/confirmdialog'
-import Button from 'primevue/button'
-
 interface Props {
   group?: string
 }
@@ -145,4 +138,4 @@ defineProps<Props>()
     justify-content: flex-end;
   }
 }
-</style> 
+</style>

@@ -7,7 +7,6 @@
     :prefetch="prefetch"
     :no-prefetch="noPrefetch"
     :prefetch-on-hover="prefetchOnHover"
-    :id="id"
     :title="title"
     :aria-label="ariaLabel"
     :aria-describedby="ariaDescribedby"
@@ -20,6 +19,7 @@
         [`p-az-link-${variant}`]: variant,
       },
     ]"
+    :id="id"
     v-if="!useHtmlAnchor">
     {{ label }}
     <slot name="icon">
@@ -48,7 +48,6 @@
     :ping="ping"
     :referrerpolicy="referrerpolicy"
     :type="type"
-    :id="id"
     :title="title"
     :aria-label="ariaLabel"
     :aria-describedby="ariaDescribedby"
@@ -60,6 +59,7 @@
         [`p-az-link-${variant}`]: variant,
       },
     ]"
+    :id="id"
     v-else>
     {{ label }}
     <slot name="icon">

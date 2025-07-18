@@ -1,5 +1,0 @@
-export { default as Breadcrumb } from './az/v-breadcrumb.vue'
-export { default as ConfirmDialog } from './az/v-confirm-dialog.vue'
-export { default as Dialog } from './az/v-dialog.vue'
-export { default as Label } from './az/v-label.vue'
-export { default as Link } from './az/v-link.vue' 

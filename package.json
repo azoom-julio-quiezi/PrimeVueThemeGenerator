@@ -1,16 +1,35 @@
 {
-  "name": "@azoom/primevue-theme-generator",
+  "name": "@azoom/az-ui",
+  "type": "module",
   "version": "1.0.0",
-  "description": "Theme generator for PrimeVue components",
-  "main": "src/index.ts",
+  "description": "AZoom UI - Design system components and theme generator for PrimeVue",
+  "license": "ISC",
+  "repository": "azoom/az-ui",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./nuxt": {
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.js"
+    }
+  },
   "bin": {
-    "primevue-theme": "./dist/cli.js"
+    "az-ui": "./dist/cli.js"
   },
   "files": [
-    "dist",
-    "assets",
-    "custom-components",
-    "nuxt"
+    "dist/**/*",
+    "src/runtime/**/*"
   ],
   "scripts": {
     "create-theme-test": "ts-node src/cli.ts create --output ./test",
@@ -29,15 +48,14 @@
     "nuxt"
   ],
   "author": "",
-  "license": "ISC",
   "peerDependencies": {
-    "vue": "^3.0.0",
-    "primevue": "^4.0.0",
-    "@primevue/nuxt-module": "^4.0.0",
-    "@primeuix/themes": "^1.0.0",
     "@azoom/az-icons": "^0.1.0",
+    "@primeuix/themes": "^1.0.0",
+    "@primevue/nuxt-module": "^4.0.0",
     "nuxt": "^3.0.0",
-    "sass": "^1.87.0"
+    "primevue": "^4.0.0",
+    "sass": "^1.87.0",
+    "vue": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "nuxt": {
@@ -45,9 +63,11 @@
     }
   },
   "devDependencies": {
+    "@azoom/eslint-config": "0.4.2",
     "@types/commander": "^2.12.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.11.24",
+    "eslint": "9.31.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",

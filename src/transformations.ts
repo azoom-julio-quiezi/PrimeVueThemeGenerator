@@ -40,25 +40,31 @@ export const TOKEN_TRANSFORMATIONS: { [key: string]: string } = {
   'submenu.icon': 'submenuIcon',
   'submenu.label': 'submenuLabel',
   'transition.duration': 'transitionDuration',
-};
+}
 
 export const TRANSFORM_PARENTS = new Set([
-  'active', 'anchor', 'border', 'contrast', 'disabled', 'filled', 
-  'float', 'focus', 'font', 'form', 'hover', 'icon', 'invalid', 
-  'muted', 'option', 'placeholder', 'selected', 'submenu', 'transition'
-]);
+  'active',
+  'anchor',
+  'border',
+  'contrast',
+  'disabled',
+  'filled',
+  'float',
+  'focus',
+  'font',
+])
 
 export function shouldTransform(path: string[]): boolean {
-  const pathStr = path.join('.');
-  return Object.keys(TOKEN_TRANSFORMATIONS).some(pattern => pathStr.endsWith(pattern));
+  const pathStr = path.join('.')
+  return Object.keys(TOKEN_TRANSFORMATIONS).some(pattern => pathStr.endsWith(pattern))
 }
 
 export function getTransformedKey(path: string[]): string {
-  const pathStr = path.join('.');
+  const pathStr = path.join('.')
   for (const [pattern, replacement] of Object.entries(TOKEN_TRANSFORMATIONS)) {
     if (pathStr.endsWith(pattern)) {
-      return replacement;
+      return replacement
     }
   }
-  return path[path.length - 1];
-} 
+  return path[path.length - 1]
+}

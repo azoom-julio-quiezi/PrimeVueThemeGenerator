@@ -9,16 +9,21 @@ A comprehensive design system package with two main features: **Custom AZoom The
 
 ## 📦 Installation
 
+### Install from npm (Recommended)
+```bash
+pnpm add @azoom/az-ui
+```
+
 ### Install from GitHub
 ```bash
 pnpm add git+https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 ```
 
-**If you use the Nuxt module (`@azoom/primevue-theme-generator/nuxt`), the theme file will be created automatically the first time Nuxt starts.**
+**If you use the Nuxt module (`@azoom/az-ui/nuxt`), the theme file will be created automatically the first time Nuxt starts.**
 
 **If you are not using the Nuxt module, or want to (re)generate the theme file manually, run:**
 ```bash
-pnpm exec primevue-theme create
+pnpm exec az-ui create
 ```
 This will generate the theme file in your project root.
 
@@ -60,7 +65,7 @@ assets/
 
 **Fallback:** You can recreate it with:
 ```bash
-pnpm exec primevue-theme create
+pnpm exec az-ui create
 ```
 
 **Important:** The `ConfirmDialog` component requires the PrimeVue ConfirmationService to be registered in your `app.vue` file. See the [ConfirmationService Setup](#-confirmationservice-setup) section below.
@@ -74,7 +79,7 @@ import Aura from '@primeuix/themes/aura'
 export default defineNuxtConfig({
   modules: [
     '@primevue/nuxt-module',
-    '@azoom/primevue-theme-generator', // Auto-imports components with 'v' in order to match Primevue components
+    '@azoom/az-ui', // Auto-imports components with 'v' in order to match Primevue components
     '@azoom/az-icons',
     '@nuxtjs/google-fonts'
   ],
@@ -89,7 +94,10 @@ export default defineNuxtConfig({
       prefix: 'v',
       include: [
         // PrimeVue components example
-        'Button', 'InputText', 'Select', 'Toast'
+        'Button',
+        'InputText',
+        'Select',
+        'Toast'
       ],
     },
     importTheme: { from: '@/assets/themes/azoom-theme.ts' },
@@ -100,8 +108,8 @@ export default defineNuxtConfig({
 **Custom Prefix Configuration:**
 ```typescript
 export default defineNuxtConfig({
-  modules: ['@azoom/primevue-theme-generator'],
-  
+  modules: ['@azoom/az-ui'],
+
   azoomTheme: {
     prefix: 'az' // Custom prefix: az-label, az-link, etc.
   }
@@ -142,13 +150,13 @@ With the Nuxt module, components are automatically imported with the configured 
 If you prefer manual imports (components are registered with the configured prefix):
 
 ```typescript
-import { 
-  Breadcrumb, 
-  Dialog, 
-  ConfirmDialog, 
-  Label, 
-  Link 
-} from '@azoom/primevue-theme-generator/custom-components';
+import {
+  Breadcrumb,
+  ConfirmDialog,
+  Dialog,
+  Label,
+  Link
+} from '@azoom/az-ui';
 ```
 
 ## 🔧 ConfirmationService Setup
@@ -174,13 +182,13 @@ nuxtApp.vueApp.use(ConfirmationService)
 - `button` - Button component styling and variants
 
 ```typescript
-import { button } from '@azoom/primevue-theme-generator/assets/themes'
+import { button } from '@azoom/az-ui'
 
 const Default = definePreset(Aura, {
   components: {
     button,
   },
-});
+})
 ```
 
 ## 🎨 Custom Components
@@ -356,14 +364,14 @@ const breadcrumbItems = [
   { label: 'Products', url: '/products' },
   { label: 'Electronics', url: '/products/electronics' },
   { label: 'Smartphones' }
-];
+]
 </script>
 ```
 
 **Advanced Usage with Custom Home:**
 ```vue
 <template>
-  <v-breadcrumb 
+  <v-breadcrumb
     :home="customHome"
     :model="breadcrumbItems" />
 </template>
@@ -372,7 +380,7 @@ const breadcrumbItems = [
 const customHome = {
   label: 'Dashboard',
   url: '/dashboard'
-};
+}
 
 const breadcrumbItems = [
   { label: 'Settings', url: '/settings' },
@@ -393,13 +401,13 @@ const breadcrumbItems = [
 </template>
 
 <script setup>
-import AzIcon from '@azoom/az-icons';
+import AzIcon from '@azoom/az-icons'
 
 const breadcrumbItems = [
   { label: 'Home', url: '/' },
   { label: 'Products', url: '/products' },
   { label: 'Current Page' }
-];
+]
 </script>
 ```
 
@@ -434,13 +442,13 @@ Convert your Figma Design Tokens to PrimeVue theme tokens:
 
 ```bash
 # Convert tokens using default paths
-pnpm exec primevue-theme convert-tokens -i ./tokens/tokens.json
+pnpm exec az-ui convert-tokens -i ./tokens/tokens.json
 
 # Specify custom output path
-pnpm exec primevue-theme convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
+pnpm exec az-ui convert-tokens -i ./tokens/tokens.json -o ./themes/custom-tokens.ts
 
 # Force overwrite existing file
-pnpm exec primevue-theme convert-tokens -i ./tokens/tokens.json -f
+pnpm exec az-ui convert-tokens -i ./tokens/tokens.json -f
 ```
 
 **Default Output:** By default, the generated file will be saved as `theme-tokens.ts` in the `./themes/` directory. The `themes/` directory will be created automatically if it doesn't exist.
@@ -451,10 +459,10 @@ After generating tokens, you need to import the generated file and use it inside
 
 ```typescript
 // src/themes/main-theme.ts
-import { definePreset } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
-import { tokens } from './theme-tokens'; // ← Import the generated tokens file
-import button from './button/button';
+import { definePreset } from '@primeuix/themes'
+import Aura from '@primeuix/themes/aura'
+import { tokens } from './theme-tokens' // ← Import the generated tokens file
+import button from './button/button'
 
 const Default = definePreset(Aura, {
   ...tokens, // ← Spread the imported tokens here
@@ -462,19 +470,22 @@ const Default = definePreset(Aura, {
     button,
     // Add more custom components here
   },
-});
+})
 
 export default {
   preset: Default,
   options: {
     // Add other options here if necessary
   },
-};
+}
 ```
 
 **Important:** The generated `theme-tokens.ts` file contains your converted Figma tokens. You must import it and spread it (`...tokens`) inside the `definePreset` function to apply your design tokens to the PrimeVue theme.
 
 ## 🔧 Development
+
+<details>
+<summary><strong>Project Structure</strong></summary>
 
 ### Project Structure
 ```
@@ -482,20 +493,44 @@ export default {
 ├── src/                    # Source code
 │   ├── index.ts           # Main entry point
 │   ├── cli.ts             # Command-line interface
+│   ├── module.ts          # Nuxt module configuration
 │   ├── types.ts           # TypeScript type definitions
 │   ├── transformations.ts # Token transformation rules
 │   ├── processors.ts      # Token processing logic
 │   ├── theme.ts           # Theme generation logic
 │   ├── validation.ts      # Token validation
-│   └── __tests__/        # Test files
-├── assets/               # Base theme files
-│   ├── styles/          # General styles
-│   └── themes/          # Theme templates
-├── custom-components/    # Custom design system components
-│   └── az/              # AZoom design system components
-├── tokens/              # Example token files
-├── package.json         # Project configuration
-└── tsconfig.json       # TypeScript configuration
+│   ├── __tests__/        # Test files
+│   │   ├── processors.test.ts
+│   │   ├── theme.test.ts
+│   │   └── validation.test.ts
+│   └── runtime/          # Runtime components and assets
+│       ├── index.ts      # Runtime entry point
+│       ├── types.ts      # Runtime type definitions
+│       ├── components.d.ts # Component declarations
+│       ├── components/   # Vue components
+│       │   ├── v-breadcrumb.vue
+│       │   ├── v-confirm-dialog.vue
+│       │   ├── v-dialog.vue
+│       │   ├── v-home-icon.vue
+│       │   ├── v-label.vue
+│       │   └── v-link.vue
+│       └── assets/       # Theme assets
+│           ├── styles/   # CSS styles
+│           │   ├── main.css
+│           │   └── reset.css
+│           └── themes/   # Theme configurations
+│               ├── azoom-theme.ts
+│               ├── button.ts
+│               └── index.ts
+├── tokens/               # Example token files
+│   ├── tokens.json
+│   └── tokens-customized.json
+├── test/                 # Generated test files
+├── dist/                 # Built distribution files
+├── package.json          # Project configuration
+├── tsconfig.json         # TypeScript configuration
+├── jest.config.js        # Jest test configuration
+└── eslint.config.js      # ESLint configuration
 ```
 
 <details>
@@ -508,8 +543,6 @@ git clone https://github.com/azoom-julio-quiezi/PrimeVueThemeGenerator.git
 # Install dependencies
 pnpm install
 ```
-
-</details>
 
 ### Available Commands
 
@@ -650,3 +683,4 @@ The generator expects Figma Design Tokens in the following structure. Here's a r
 
 ### Token References:
 The generator supports token references using `{token.path}` syntax, allowing you to reference other tokens within your design system.
+</details>

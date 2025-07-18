@@ -1,19 +1,19 @@
 <template>
-  <Dialog v-bind="$attrs"
+  <v-dialog v-bind="$attrs"
     :visible="visible"
     :pt="{
       headerActions: {
         style: {
           gap: '0',
-        }
+        },
       },
       pcCloseButton: {
         root: {
           style: {
-            display: 'contents'
-          }
+            display: 'contents',
+          },
         },
-      }
+      },
     }"
     class="dialog"
     @update:visible="$emit('update:visible', $event)"
@@ -22,8 +22,7 @@
     <template #closeicon>
       <div class="block"
         @click="$emit('update:visible', false)">
-        <AzIcon
-          class="icon"
+        <az-icon class="icon"
           name="close"
           type="outline"
           size="14"
@@ -39,12 +38,10 @@
       <slot :name="name"
         v-bind="slotData" />
     </template>
-  </Dialog>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
-import Dialog from 'primevue/dialog'
-
 interface Props {
   visible?: boolean
 }
