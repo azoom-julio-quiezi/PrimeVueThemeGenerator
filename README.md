@@ -482,10 +482,9 @@ export default {
 
 **Important:** The generated `theme-tokens.ts` file contains your converted Figma tokens. You must import it and spread it (`...tokens`) inside the `definePreset` function to apply your design tokens to the PrimeVue theme.
 
-## 🔧 Development
-
 <details>
-<summary><strong>Project Structure</strong></summary>
+<summary><strong>Development/strong></summary>
+## 🔧 Development
 
 ### Project Structure
 ```
@@ -532,9 +531,6 @@ export default {
 ├── jest.config.js        # Jest test configuration
 └── eslint.config.js      # ESLint configuration
 ```
-
-<details>
-<summary><strong>Local Development</strong></summary>
 
 ```bash
 # Clone repository
