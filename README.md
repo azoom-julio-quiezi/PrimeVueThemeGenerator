@@ -203,7 +203,7 @@ Our design system includes several custom components that enhance PrimeVue with 
 | **Link** | Smart link component | Auto-detects internal/external, multiple variants |
 | **Dialog** | Enhanced dialog with custom close | Japanese close button |
 | **ConfirmDialog** | Custom confirm dialog | Japanese close button, icon support |
-| **Breadcrumb** | Navigation breadcrumb | AzIcon home, custom separators |
+| **Breadcrumb** | Navigation breadcrumb | Custom home icon |
 
 ### Quick Examples
 
@@ -386,7 +386,7 @@ interface ConfirmDialogOptions {
 The ConfirmationService must be registered in your `app.vue` file. See the [ConfirmationService Setup](#-confirmationservice-setup) section above.
 
 #### Breadcrumb Component
-Custom breadcrumb component with AzIcon home icon and consistent styling.
+Custom breadcrumb component with home icon and consistent styling.
 
 **Basic Setup:**
 ```vue
@@ -430,7 +430,7 @@ const breadcrumbItems = [
 <template>
   <v-breadcrumb :model="breadcrumbItems">
     <template #separator>
-      <AzIcon name="chevron-right" size="12" />
+      <AzIcon name="location" size="12" />
     </template>
   </v-breadcrumb>
 </template>
@@ -447,7 +447,7 @@ const breadcrumbItems = [
 ```
 
 **Key Features:**
-- AzIcon home icon with consistent styling
+- Custom home icon with consistent styling
 - Customizable home item
 - Custom separator support
 - Full PrimeVue Breadcrumb integration
