@@ -56,7 +56,7 @@ assets/
     └── azoom-theme.ts
 ```
 
-**Note:** The theme file is created automatically. Components, composables, CSS, and other theme files are imported automatically from the package via the Nuxt module.
+**Note:** The theme file is created automatically. Components, CSS, and other theme files are imported automatically from the package via the Nuxt module.
 
 **Fallback:** You can recreate it with:
 ```bash
@@ -112,7 +112,7 @@ export default defineNuxtConfig({
 
 ### Auto-Import Usage (Recommended)
 
-With the Nuxt module, components and composables are automatically imported with the configured prefix (default: 'v'):
+With the Nuxt module, components are automatically imported with the configured prefix (default: 'v'):
 
 ```vue
 <template>
@@ -123,11 +123,6 @@ With the Nuxt module, components and composables are automatically imported with
   <v-confirm-dialog />
   <v-breadcrumb :model="breadcrumbItems" />
 </template>
-
-<script setup>
-// Composables are auto-imported too!
-const { showConfirm } = useConfirmDialog()
-</script>
 ```
 
 **With Custom Prefix:**
@@ -154,9 +149,6 @@ import {
   Label, 
   Link 
 } from '@azoom/primevue-theme-generator/custom-components';
-
-// Composables
-import { useConfirmDialog } from '@azoom/primevue-theme-generator/custom-composables';
 ```
 
 ## 🔧 ConfirmationService Setup
@@ -297,84 +289,49 @@ Custom confirm dialog with Japanese close button, icon support, and enhanced sty
 ```
 
 **Usage with Composable:**
+
+Note: ConfirmDialog functionality is handled directly by PrimeVue's ConfirmationService.
+Users can use PrimeVue's useConfirm composable directly:
+
 ```vue
 <template>
-  <button @click="showDeleteConfirm">Delete Item</button>
+  <button @click="showBasicConfirm">Save item</button>
 </template>
 
 <script setup>
-const { showConfirm } = useConfirmDialog();
+import { useConfirm } from 'primevue/useconfirm'
 
-const showDeleteConfirm = () => {
-  showConfirm({
-    message: 'Are you sure you want to delete this item?',
-    header: 'Confirm Deletion',
-    icon: 'warning',
+const confirm = useConfirm()
+
+const showBasicConfirm = () => {
+  confirm.require({
+    header: 'Basic Confirmation',
+    message: 'Are you sure you want to proceed?',
+    icon: 'help',
     iconProps: {
-      type: 'filled',
+      type: 'outline',
       size: 20,
-      color: '#ef4444'
-    },
-    acceptProps: {
-      label: 'Delete',
-      severity: 'danger'
-    },
-    rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
-      outlined: true
+      color: 'red'
     },
     accept: () => {
-      // Handle deletion
-      console.log('Item deleted');
+      console.log('Item saved')
     },
     reject: () => {
-      // Handle cancellation
-      console.log('Deletion cancelled');
+      console.log('Item rejected')
     }
-  });
-};
+  })
+}
 </script>
 ```
 
 **Key Features:**
 - Japanese "閉じる" close button with icon
-- Custom icon support with configurable properties
+- Custom AzIcon support with configurable properties
 - Customizable button labels and styling
 - Optional group support for multiple confirm dialogs
 - Advanced slot-based customization
-- TypeScript support
 
-**Complete API:**
-```typescript
-interface ConfirmDialogOptions {
-  message: string
-  header?: string
-  group?: string
-  icon?: string // AzIcon name (e.g., 'warning', 'info')
-  iconProps?: {
-    type?: 'outline' | 'filled' | 'duotone'
-    size?: number
-    bounded?: 'tight' | 'loose'
-    color?: string
-    [key: string]: any
-  }
-  accept?: () => void
-  reject?: () => void
-  acceptLabel?: string
-  rejectLabel?: string
-  acceptProps?: {
-    label?: string
-    severity?: 'primary' | 'secondary' | 'success' | 'info' | 'warn' | 'danger'
-    outlined?: boolean
-  }
-  rejectProps?: {
-    label?: string
-    severity?: 'primary' | 'secondary' | 'success' | 'info' | 'warn' | 'danger'
-    outlined?: boolean
-  }
-}
-```
+**Note:** This component works with PrimeVue's ConfirmationService. Users should use PrimeVue's `useConfirm` composable directly for dialog functionality.
 
 **Dependencies:**
 - PrimeVue ConfirmDialog component
@@ -536,8 +493,6 @@ export default {
 │   └── themes/          # Theme templates
 ├── custom-components/    # Custom design system components
 │   └── az/              # AZoom design system components
-├── custom-composables/   # Custom composables
-│   └── az/              # AZoom composables
 ├── tokens/              # Example token files
 ├── package.json         # Project configuration
 └── tsconfig.json       # TypeScript configuration
