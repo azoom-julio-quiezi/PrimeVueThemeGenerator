@@ -43,14 +43,6 @@ export default defineNuxtModule({
       priority: 10 // Higher priority to override PrimeVue Breadcrumb
     })
 
-    // Auto-import custom composables
-    addImports([
-      {
-        name: 'useConfirmDialog',
-        from: resolve('../custom-composables/az/use-confirm-dialog')
-      }
-    ])
-
     // Add CSS files from package
     nuxt.options.css.push(resolve('../assets/styles/reset.css'))
     nuxt.options.css.push(resolve('../assets/styles/main.css'))

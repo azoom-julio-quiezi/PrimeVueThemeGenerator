@@ -16,7 +16,8 @@
               name="close"
               type="outline"
               size="14"
-              bounded="tight" />
+              bounded="tight"
+              color="var(--p-button-text-secondary-color)" />
             <span class="text">閉じる</span>
           </button>
 
@@ -27,9 +28,10 @@
                 v-if="message.icon"
                 :name="message.icon"
                 v-bind="{
-                  type: message.iconProps?.type ?? 'outline',
+                  type: message.iconProps?.type ?? 'fill',
                   size: message.iconProps?.size ?? 16,
-                  bounded: message.iconProps?.bounded ?? 'tight',
+                  bounded: message.iconProps?.bounded ?? 'spacious',
+                  color: message.iconProps?.color ?? 'var(--p-dialog-color)',
                   ...(message.iconProps || {})
                 }"
                 class="icon" />
@@ -103,7 +105,7 @@ defineProps<Props>()
     transition: background-color 0.2s;
     border: none;
     background: none;
-    color: inherit;
+    color: var(--p-button-text-secondary-color);
     height: 2.5rem;
     padding: 0 0.5rem;
 
@@ -126,7 +128,7 @@ defineProps<Props>()
   }
 
   .message {
-    color: var(--p-surface-700);
+    color: var(--p-dialog-color);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -134,7 +136,6 @@ defineProps<Props>()
 
     .icon {
       font-size: 1.25rem;
-      color: var(--p-primary-500);
     }
   }
 

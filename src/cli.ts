@@ -48,10 +48,9 @@ program
       copyFileSync(themeFile, outputThemeFile);
       console.log(`✅ Theme file created: ${outputThemeFile}`);
 
-      console.log(`\n📦 Components and composables are auto-imported by the Nuxt module:`);
+      console.log(`\n📦 Components are auto-imported by the Nuxt module:`);
       console.log(`   Add '@azoom/primevue-theme-generator/nuxt' to your modules array`);
       console.log(`   Components: v-label, v-link, v-dialog, v-confirm-dialog, v-breadcrumb`);
-      console.log(`   Composables: useConfirmDialog (auto-imported)`);
       console.log(`   CSS and other theme files are imported automatically`);
       
       console.log(`\n🎉 Theme structure created successfully!`);

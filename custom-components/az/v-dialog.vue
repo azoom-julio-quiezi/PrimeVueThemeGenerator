@@ -27,7 +27,8 @@
           name="close"
           type="outline"
           size="14"
-          bounded="tight" />
+          bounded="tight"
+          color="var(--p-dialog-color)" />
         <span class="text">閉じる</span>
       </div>
     </template>
